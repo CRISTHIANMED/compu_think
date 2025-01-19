@@ -37,7 +37,8 @@ dependencies:
   cupertino_icons: ^1.0.8
   supabase_flutter: ^2.0.0
   flutter_dotenv: ^5.0.2 # Manejar tus variables de entorno
-
+  path_provider: ^2.0.10
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter
