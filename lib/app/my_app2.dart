@@ -1,23 +1,16 @@
 import 'package:compu_think/presentation/screens/login_screen.dart';
-import 'package:compu_think/presentation/screens/logout_screen.dart';
-import 'package:compu_think/presentation/screens/unit_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class MyApp extends StatelessWidget {
-  const MyApp ({super.key});
+class MyApp2 extends StatelessWidget {
+  const MyApp2 ({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       title: 'Unidad',
       debugShowCheckedModeBanner: false,  // Desactiva el banner de depuración
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const LoginScreen(),
-        '/Tema': (context) => const UnitScreen(),
-        '/Salir': (context) => const LogoutScreen(),
-      },
+      home: LoginScreen(),
     );
   }
 }

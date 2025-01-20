@@ -36,8 +36,9 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   supabase_flutter: ^2.0.0
-  flutter_dotenv: ^5.0.2 # Manejar tus variables de entorno
+  flutter_dotenv: ^5.2.1 # Manejar tus variables de entorno
   path_provider: ^2.0.10
+  dartz: ^0.10.1
   
 dev_dependencies:
   flutter_test:
@@ -62,7 +63,9 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
+  assets:
+    - .env
+    - assets/images/
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 
