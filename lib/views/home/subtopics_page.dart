@@ -28,11 +28,12 @@ class SubtopicsPage extends StatefulWidget {
   const SubtopicsPage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _SubtopicsPageState createState() => _SubtopicsPageState();
 }
 
 class _SubtopicsPageState extends State<SubtopicsPage> {
-  int _currentIndex = 0;
+  final int _currentIndex = 0;
   late List<Subtema> _subtemas;
 
   @override

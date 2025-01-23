@@ -18,6 +18,7 @@ class UserRepository {
         throw Exception('Contraseña incorrecta.');
       }
         } catch (e) {
+      // ignore: avoid_print
       print('Error al obtener el usuario: $e');
       return null;
     }

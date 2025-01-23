@@ -9,9 +9,11 @@ class SupabaseService {
         url: dotenv.env['SUPABASE_URL']!,
         anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
       );
+      // ignore: avoid_print
       print('Supabase initialized successfully.');
     } catch (e) {
       // Captura cualquier error que ocurra durante la inicialización
+      // ignore: avoid_print
       print('Error initializing Supabase: $e');
       // Puedes agregar más lógica de manejo de errores aquí, como mostrar un mensaje al usuario
     }
