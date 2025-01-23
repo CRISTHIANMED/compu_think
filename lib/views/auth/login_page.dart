@@ -1,8 +1,4 @@
 import 'package:compu_think/controllers/auth_controller.dart';
-import 'package:compu_think/models/repositories/user_repository.dart';
-import 'package:compu_think/services/supabase_service.dart';
-import 'package:flutter/material.dart';
-
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
