@@ -1,6 +1,7 @@
-import 'package:compu_think/presentation/screens/login_screen.dart';
-import 'package:compu_think/presentation/screens/logout_screen.dart';
-import 'package:compu_think/presentation/screens/unit_screen.dart';
+import 'package:compu_think/views/auth/login_page.dart';
+import 'package:compu_think/views/auth/logout_page.dart';
+import 'package:compu_think/views/home/subtopics_page.dart';
+import 'package:compu_think/views/home/units_page.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -14,9 +15,11 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,  // Desactiva el banner de depuración
       initialRoute: '/',
       routes: {
-        '/': (context) => const LoginScreen(),
-        '/Tema': (context) => const UnitScreen(),
-        '/Salir': (context) => const LogoutScreen(),
+        '/': (context) => const LoginPage(),
+        '/Unidad': (context) => const UnitsPage(),
+        '/Salir': (context) => const LogoutPage(),
+        '/Tema': (context) => const SubtopicsPage(),
+
       },
     );
   }

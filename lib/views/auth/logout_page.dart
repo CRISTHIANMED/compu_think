@@ -1,15 +1,15 @@
 import 'package:compu_think/core/widgets/custom_bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 
-class LogoutScreen extends StatefulWidget {
-  const LogoutScreen({super.key});
+class LogoutPage extends StatefulWidget {
+  const LogoutPage({super.key});
 
   @override
   // ignore: library_private_types_in_public_api
-  _LogoutScreenState createState() => _LogoutScreenState();
+  _LogoutPageState createState() => _LogoutPageState();
 }
 
-class _LogoutScreenState extends State<LogoutScreen> {
+class _LogoutPageState extends State<LogoutPage> {
   // Datos del usuario (puedes cargarlos dinámicamente desde un backend o localmente)
   String userName = "Cristhian Medina";
   String userEmail = "correo@ejemplo.com";
@@ -18,7 +18,6 @@ class _LogoutScreenState extends State<LogoutScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Logout"),
         centerTitle: true,
       ),
       body: Center(

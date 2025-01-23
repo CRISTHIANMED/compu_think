@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
 
   @override
   // ignore: library_private_types_in_public_api
-  _LoginScreenState createState() => _LoginScreenState();
+  _LoginPageState createState() => _LoginPageState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscureText = true; // Controla si la contraseña es visible o no
@@ -74,7 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ElevatedButton(
               onPressed:  () {
                 Navigator.pushReplacementNamed
-                (context, '/Tema'); // Navega a la ruta /tema
+                (context, '/Unidad'); // Navega a la ruta /tema
               },
               child: const Text('Iniciar sesión'),
             ),

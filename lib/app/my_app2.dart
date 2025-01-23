@@ -1,4 +1,4 @@
-import 'package:compu_think/presentation/screens/login_screen.dart';
+import 'package:compu_think/views/auth/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -10,7 +10,7 @@ class MyApp2 extends StatelessWidget {
     return const MaterialApp(
       title: 'Unidad',
       debugShowCheckedModeBanner: false,  // Desactiva el banner de depuración
-      home: LoginScreen(),
+      home: HomePage(),
     );
   }
 }
@@ -24,7 +24,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final _future = Supabase.instance.client
-    .from('persona')
+    .from('tema')
     .select();
 
 
@@ -50,7 +50,7 @@ class _HomePageState extends State<HomePage> {
               itemCount: unidades.length,
               itemBuilder: (context, index) {
                 final unidad = unidades[index];
-                return ListTile(title: Text(unidad['nombre_1']));
+                return ListTile(title: Text(unidad['titulo']));
               },
             );
           } else {

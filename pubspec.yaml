@@ -37,9 +37,13 @@ dependencies:
   cupertino_icons: ^1.0.8
   supabase_flutter: ^2.0.0
   flutter_dotenv: ^5.2.1 # Manejar tus variables de entorno
-  path_provider: ^2.0.10
+  path_provider: ^2.1.5
   dartz: ^0.10.1
-  
+  flutter_pdfview: ^1.4.0
+  youtube_player_flutter: ^9.1.1
+  http: ^1.3.0
+
+ 
 dev_dependencies:
   flutter_test:
     sdk: flutter
