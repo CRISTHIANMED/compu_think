@@ -2,64 +2,21 @@ import 'package:compu_think/models/entities/user_entity.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class UserRepository {
+  final SupabaseClient supabase;
 
-  // Obtener un usuario por email y contraseña
-  Future<UserEntity?> getUserByEmailAndPassword(String email, String password) async {
-    try {
-      final response = await Supabase.instance.client
-          .from('persona')
-          .select()
-          .eq('email', email)
-          .single();
+  UserRepository(this.supabase);
 
-      if (response['contraseña'] == password) {
-        return UserEntity.fromMap(response);
-      } else {
-        throw Exception('Contraseña incorrecta.');
-      }
-        } catch (e) {
-      // ignore: avoid_print
-      print('Error al obtener el usuario: $e');
-      return null;
+  Future<UserEntity?> validateUser(String email, String password) async {
+    final response = await supabase
+        .from('persona')
+        .select()
+        .eq('email', email)
+        .eq('contrasena', password)
+        .single();
+
+    if (response.isEmpty) {
+      return UserEntity.fromMap(response);
     }
+    return null; // Usuario no encontrado o contraseña incorrecta
   }
-
-  /*// Enviar (crear) un nuevo usuario a la base de datos
-  Future<bool> createUser(UserEntity user) async {
-    try {
-      final response = await Supabase.instance.client
-          .from('persona')
-          .insert(user.toMap());
-
-      if (response.error == null) {
-        return true;
-      } else {
-        print('Error al crear el usuario: ${response.error!.message}');
-        return false;
-      }
-    } catch (e) {
-      print('Error al crear el usuario: $e');
-      return false;
-    }
-  }
-
-  // Actualizar un usuario existente en la base de datos
-  Future<bool> updateUser(UserEntity user) async {
-    try {
-      final response = await Supabase.instance.client
-          .from('persona')
-          .update(user.toMap())
-          .eq('id', user.id);
-
-      if (response.error == null) {
-        return true;
-      } else {
-        print('Error al actualizar el usuario: ${response.error!.message}');
-        return false;
-      }
-    } catch (e) {
-      print('Error al actualizar el usuario: $e');
-      return false;
-    }
-  }*/
 }

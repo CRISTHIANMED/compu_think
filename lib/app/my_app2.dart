@@ -23,8 +23,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
 
-
-  final _future = Supabase.instance.client
+  final _future =  Supabase.instance.client
     .from('tema')
     .select();
 
