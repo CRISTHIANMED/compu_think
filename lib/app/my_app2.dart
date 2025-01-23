@@ -1,4 +1,3 @@
-import 'package:compu_think/views/auth/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -23,6 +22,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+
+
   final _future = Supabase.instance.client
     .from('tema')
     .select();

@@ -2,8 +2,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class SupabaseService {
-  
-  
   static Future<void> init() async {
     try {
       await dotenv.load(fileName: '.env');
@@ -18,4 +16,5 @@ class SupabaseService {
       // Puedes agregar más lógica de manejo de errores aquí, como mostrar un mensaje al usuario
     }
   }
+
 }

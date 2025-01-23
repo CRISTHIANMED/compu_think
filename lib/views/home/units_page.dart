@@ -1,4 +1,4 @@
-import 'package:compu_think/core/widgets/custom_bottom_navigation_bar.dart';
+import 'package:compu_think/utils/widgets/custom_bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 
 class UnitsPage extends StatefulWidget {
