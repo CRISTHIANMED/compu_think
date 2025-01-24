@@ -5,38 +5,58 @@ class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _LoginPageState createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   final AuthController _authController = AuthController();
 
-  bool _obscureText = true; // Controla si la contraseña es visible o no
+  bool _obscureText = true;
   String _errorMessage = '';
 
+  @override
+  void initState() {
+    super.initState();
+    _checkStoredCredentials();
+  }
+
+  Future<void> _checkStoredCredentials() async {
+    bool hasCredentials = await _authController.checkStoredCredentials();
+    if (hasCredentials) {
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(context, '/Unidad');
+    }
+  }
+
   Future<void> _login() async {
+    String email = _emailController.text.trim();
+    String password = _passwordController.text.trim();
+
+    if (email.isEmpty || password.isEmpty) {
+      setState(() {
+        _errorMessage = 'Por favor, complete todos los campos.';
+      });
+      return;
+    }
+
     try {
-      bool success = await _authController.signIn(
-        _emailController.text,
-        _passwordController.text,
-      );
+      bool success = await _authController.login(email, password);
 
       if (success) {
+        await _authController.storeCredentials(email, password);
+        if (!mounted) return;
         Navigator.pushReplacementNamed(context, '/Unidad');
       } else {
-        // Mostrar error si el inicio de sesión falla
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Correo electrónico o contraseña incorrectos')),
-        );
+        setState(() {
+          _errorMessage = 'Correo electrónico o contraseña incorrectos.';
+        });
       }
     } catch (e) {
-      // Mostrar error si hay algún problema con la consulta
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+      setState(() {
+        _errorMessage = 'Ocurrió un error al intentar iniciar sesión: $e';
+      });
     }
   }
 
@@ -48,58 +68,47 @@ class _LoginPageState extends State<LoginPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Imagen en la parte superior
             Image.asset(
-              'assets/images/logo2.png', // Reemplaza con la ruta de tu imagen
-              height: 120, // Ajusta la altura según lo necesites
+              'assets/images/logo2.png',
+              height: 120,
             ),
-
-            const SizedBox(height: 50), // Espacio después de la imagen
-
-            // Campo de correo electrónico
+            const SizedBox(height: 50),
             TextField(
               controller: _emailController,
               decoration: InputDecoration(
                 labelText: 'Correo electrónico o Username',
-                prefixIcon: const Icon(Icons.mail), // Ícono de carta
+                prefixIcon: const Icon(Icons.mail),
                 border: OutlineInputBorder(
-                  borderRadius:
-                      BorderRadius.circular(30), // Bordes más redondeados
+                  borderRadius: BorderRadius.circular(30),
                 ),
               ),
             ),
-
             const SizedBox(height: 16),
-
-            // Campo de contraseña con ícono y habilitador para ver contraseña
             TextField(
               controller: _passwordController,
               obscureText: _obscureText,
-              autofillHints: const [], // Deshabilita el autocompletado
+              autofillHints: const [],
               decoration: InputDecoration(
                 labelText: 'Contraseña',
-                prefixIcon: const Icon(Icons.lock), // Ícono de candado
+                prefixIcon: const Icon(Icons.lock),
                 suffixIcon: IconButton(
                   icon: Icon(
                     _obscureText ? Icons.visibility_off : Icons.visibility,
                   ),
                   onPressed: () {
                     setState(() {
-                      _obscureText = !_obscureText; // Cambia la visibilidad
+                      _obscureText = !_obscureText;
                     });
                   },
                 ),
                 border: OutlineInputBorder(
-                  borderRadius:
-                      BorderRadius.circular(30), // Bordes más redondeados
+                  borderRadius: BorderRadius.circular(30),
                 ),
               ),
             ),
-
             const SizedBox(height: 30),
-
             ElevatedButton(
-              onPressed:  _login,
+              onPressed: _login,
               child: const Text('Iniciar sesión'),
             ),
             if (_errorMessage.isNotEmpty)
@@ -108,6 +117,7 @@ class _LoginPageState extends State<LoginPage> {
                 child: Text(
                   _errorMessage,
                   style: const TextStyle(color: Colors.red),
+                  textAlign: TextAlign.center,
                 ),
               ),
           ],

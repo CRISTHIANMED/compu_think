@@ -1,3 +1,4 @@
+import 'package:compu_think/controllers/auth_controller.dart';
 import 'package:compu_think/utils/widgets/custom_bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 
@@ -13,6 +14,7 @@ class _LogoutPageState extends State<LogoutPage> {
   // Datos del usuario (puedes cargarlos dinámicamente desde un backend o localmente)
   String userName = "Cristhian Medina";
   String userEmail = "correo@ejemplo.com";
+  final AuthController _authController = AuthController();
 
   @override
   Widget build(BuildContext context) {
@@ -80,8 +82,9 @@ class _LogoutPageState extends State<LogoutPage> {
   }
 
   // Función para manejar la acción de cerrar sesión
-  void _logout(BuildContext context) {
+  Future<void> _logout(BuildContext context) async {
     // Aquí puedes agregar la lógica para cerrar sesión (por ejemplo, eliminar tokens)
+    await _authController.clearCredentials();
     Navigator.pushReplacementNamed(context, '/'); // Vuelve a la pantalla de inicio
   }
 }

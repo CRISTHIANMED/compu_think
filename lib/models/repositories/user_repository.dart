@@ -1,22 +1,29 @@
 import 'package:compu_think/models/entities/user_entity.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+
 class UserRepository {
-  final SupabaseClient supabase;
 
-  UserRepository(this.supabase);
+  final SupabaseClient supabase = Supabase.instance.client;
 
-  Future<UserEntity?> validateUser(String email, String password) async {
+  Future<UserEntity?> fetchUserByEmailOrUsername(String input, String contrasena) async {
     final response = await supabase
-        .from('persona')
-        .select()
-        .eq('email', email)
-        .eq('contrasena', password)
-        .single();
+      .from('persona')
+      .select()
+      .or('name_user.eq.$input, email.eq.$input');
 
     if (response.isEmpty) {
-      return UserEntity.fromMap(response);
+      throw Exception('Usuario no encontrado');
     }
-    return null; // Usuario no encontrado o contraseña incorrecta
+
+    if (response.isNotEmpty) {
+      final UserEntity persona = UserEntity.fromMap(response[0]);
+      // Compara la contraseña
+      if (persona.contrasena == contrasena) {
+        return persona;
+      }
+    }
+    return null;
   }
+
 }

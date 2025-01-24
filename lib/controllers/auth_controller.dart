@@ -1,30 +1,33 @@
 import 'package:compu_think/models/entities/user_entity.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-
+import 'package:compu_think/models/repositories/user_repository.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthController {
-  final SupabaseClient supabase = Supabase.instance.client;
+  final UserRepository _userRepository = UserRepository();
 
-  Future<bool> signIn(String email, String password) async {
-    final response = await supabase
-        .from('persona')
-        .select()
-        .eq('email', email);
+  Future<bool> checkStoredCredentials() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? email = prefs.getString('email');
+    String? password = prefs.getString('password');
 
-    if (response.isEmpty) {
-      throw Exception('Usuario no encontrado');
-    }
+    // Retornar `true` si hay credenciales guardadas
+    return email != null && password != null && email.isNotEmpty && password.isNotEmpty;
+  }
 
-    final List data = response;
-    if (data.isNotEmpty) {
-      //final UserEntity persona = UserEntity.fromMap(data[0]);
-      String dato = data[0]['contrasena'];
-      // Compara la contraseña
-      if (data[0]['contrasena'] == password) {
-        return true;
-      }
-    }
+  Future<void> storeCredentials(String email, String password) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('email', email);
+    await prefs.setString('password', password);
+  }
 
-    return false;
+  Future<bool> login(String input, String password) async {
+    UserEntity? persona = await _userRepository.fetchUserByEmailOrUsername(input, password);
+    return persona?.contrasena == password; 
+  }
+
+  Future<void> clearCredentials() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('email');
+    await prefs.remove('password');
   }
 }
