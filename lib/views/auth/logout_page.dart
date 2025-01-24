@@ -1,20 +1,43 @@
+// ignore_for_file: use_build_context_synchronously, library_private_types_in_public_api
+
 import 'package:compu_think/controllers/auth_controller.dart';
 import 'package:compu_think/utils/widgets/custom_bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LogoutPage extends StatefulWidget {
   const LogoutPage({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _LogoutPageState createState() => _LogoutPageState();
 }
 
 class _LogoutPageState extends State<LogoutPage> {
-  // Datos del usuario (puedes cargarlos dinámicamente desde un backend o localmente)
-  String userName = "Cristhian Medina";
-  String userEmail = "correo@ejemplo.com";
+  String userName = ""; // Nombre completo
+  String userEmail = ""; // Correo electrónico
   final AuthController _authController = AuthController();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData(); // Cargar datos del usuario al iniciar la página
+  }
+
+  // Método para cargar los datos del usuario desde SharedPreferences
+  Future<void> _loadUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final nombre1 = prefs.getString('nombre1') ?? '';
+    final nombre2 = prefs.getString('nombre2') ?? '';
+    final apellido1 = prefs.getString('apellido1') ?? '';
+    final apellido2 = prefs.getString('apellido2') ?? '';
+    final email = prefs.getString('email') ?? '';
+
+    // Construir el nombre completo y asignar el correo
+    setState(() {
+      userName = "$nombre1 $nombre2 $apellido1 $apellido2".replaceAll(RegExp(r'\s+'), ' ').trim();
+      userEmail = email;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,7 +106,6 @@ class _LogoutPageState extends State<LogoutPage> {
 
   // Función para manejar la acción de cerrar sesión
   Future<void> _logout(BuildContext context) async {
-    // Aquí puedes agregar la lógica para cerrar sesión (por ejemplo, eliminar tokens)
     await _authController.clearCredentials();
     Navigator.pushReplacementNamed(context, '/'); // Vuelve a la pantalla de inicio
   }
