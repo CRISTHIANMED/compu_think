@@ -51,7 +51,7 @@ class _LoginPageState extends State<LoginPage> {
         Navigator.pushReplacementNamed(context, '/Unidad');
       } else {
         setState(() {
-          _errorMessage = 'Correo electrónico o contraseña incorrectos.';
+          _errorMessage = 'Usuario o contraseña incorrectos.';
         });
       }
     } catch (e) {

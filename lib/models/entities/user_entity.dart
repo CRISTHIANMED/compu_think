@@ -35,4 +35,19 @@ class UserEntity {
       nombreU: map['name_user'] ?? '',
     );
   }
+
+  // Método para convertir una entidad Unidad a un mapa (para la base de datos)
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'email': email,
+      'nombre_1': nombre1,
+      'nombre_2': nombre2,
+      'apellido_1': apellido1,
+      'apellido_2': apellido2,
+      'rol': rol,
+      'contrasena': contrasena,
+      'name_user': nombreU,
+    };
+  }
 }
