@@ -1,9 +1,8 @@
 import 'package:compu_think/controllers/unit_controller.dart';
-import 'package:compu_think/models/repositories/unit_repository.dart';
-import 'package:compu_think/models/repositories/user_unit_repository.dart';
+import 'package:compu_think/models/entities/view_detail_unit_entity.dart';
 import 'package:flutter/material.dart';
-import 'package:compu_think/models/entities/unit_entity.dart';
 import 'package:compu_think/utils/widgets/custom_bottom_navigation_bar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UnitsPage extends StatefulWidget {
   const UnitsPage({super.key});
@@ -13,11 +12,11 @@ class UnitsPage extends StatefulWidget {
 }
 
 class _UnitsPageState extends State<UnitsPage> {
-  final UnitController _unitController = UnitController() ;
-  List<UnitEntity> _unidades = [];
+  final UnitController _unitController = UnitController();
+  List<ViewDetailUnitEntity> _unidades = [];
   bool _isLoading = true;
   String _errorMessage = '';
-  bool isEnabled = true;
+  late bool isEnabled;
 
   @override
   void initState() {
@@ -28,7 +27,11 @@ class _UnitsPageState extends State<UnitsPage> {
 
   Future<void> fetchUnits() async {
     try {
-      final unidades = await _unitController.fetchUnits();
+      final prefs = await SharedPreferences.getInstance();
+      final idString = prefs.getString('id');
+      final int idPersona = idString != null ? int.parse(idString) : 0;
+
+      final unidades = await _unitController.fetchUnitsByPersonId(idPersona);
       setState(() {
         _unidades = unidades;
         _isLoading = false;
@@ -68,14 +71,15 @@ class _UnitsPageState extends State<UnitsPage> {
                   itemCount: _unidades.length,
                   itemBuilder: (ctx, index) {
                     final unidad = _unidades[index];
+                    bool? isEnabled = unidad.isEnabled;
                     return Container(
                       margin: const EdgeInsets.symmetric(
                           vertical: 8, horizontal: 16),
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: isEnabled
-                            ? Colors.white
-                            : Colors.white.withOpacity(0.6),
+                        color: isEnabled!
+                            ? unidad.colorFondo
+                            : unidad.colorFondo.withOpacity(0.6),
                         borderRadius: BorderRadius.circular(15),
                         boxShadow: const [
                           BoxShadow(color: Colors.black26, blurRadius: 5),
@@ -87,7 +91,7 @@ class _UnitsPageState extends State<UnitsPage> {
                             opacity: isEnabled ? 1.0 : 0.5,
                             child: ClipOval(
                               child: Image.network(
-                                convertGoogleDriveLink(unidad.urlImagen ?? ''),
+                                convertGoogleDriveLink(unidad.unidadUrlImagen),
                                 width: 100,
                                 height: 100,
                                 fit: BoxFit.cover,
@@ -102,7 +106,7 @@ class _UnitsPageState extends State<UnitsPage> {
                                 Opacity(
                                   opacity: isEnabled ? 1.0 : 0.5,
                                   child: Text(
-                                    'Unidad ${unidad.orden}',
+                                    'Unidad ${unidad.unidadOrden}',
                                     style: const TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
@@ -113,8 +117,11 @@ class _UnitsPageState extends State<UnitsPage> {
                                 Opacity(
                                   opacity: isEnabled ? 1.0 : 0.5,
                                   child: Text(
-                                    unidad.nombre,
-                                    style: const TextStyle(color: Colors.grey),
+                                    unidad.unidadNombre,
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
                                 const SizedBox(height: 8),
@@ -122,9 +129,9 @@ class _UnitsPageState extends State<UnitsPage> {
                                     opacity: isEnabled ? 1.0 : 0.5,
                                     child: Text(
                                       unidad
-                                          .descripcion, // Muestra "Sin descripción" si es nula
+                                          .unidadDescripcion, // Muestra "Sin descripción" si es nula
                                       style: const TextStyle(
-                                        color: Colors.grey,
+                                        color: Colors.black,
                                         fontSize:
                                             12, // Tamaño más pequeño para que sea sutil
                                         fontStyle: FontStyle.italic,

@@ -1,4 +1,6 @@
 import 'package:compu_think/models/entities/unit_entity.dart';
+import 'package:compu_think/models/entities/view_detail_unit_entity.dart';
+import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class UnitRepository {
@@ -66,4 +68,47 @@ class UnitRepository {
       throw Exception('Error al obtener la unidad con id $id: $e');
     }
   }
+
+  Future<List<ViewDetailUnitEntity>> getUnitsByPersonId(int personId) async {
+  try {
+    // Realiza la consulta a Supabase
+    final response = await Supabase.instance.client
+        .from('vista_detalles_unidad') // Nombre de tu vista
+        .select()
+        .eq('id_persona', personId);
+
+    // Convertir los datos obtenidos a objetos ViewDetailUnitEntity
+    List<ViewDetailUnitEntity> units = [];
+    for (var unit in response) {
+      units.add(ViewDetailUnitEntity.fromMap(unit));
+    }
+
+    // Asignar estado y colores según el tipo de estado
+    for (var unit in units) {
+      switch (unit.tipoEstadoDescripcion.toLowerCase()) {
+        case 'pendiente':
+          unit.isEnabled = true;
+          unit.colorFondo = const Color.fromARGB(255, 235, 239, 115) ;
+          break;
+        case 'no_completado':
+          unit.isEnabled = false;
+          unit.colorFondo = const Color.fromARGB(255, 236, 126, 126) ;
+          break;
+        case 'completado':
+          unit.isEnabled = true;
+          unit.colorFondo = const Color.fromARGB(255, 71, 177, 74) ;
+          break;
+        default:
+          unit.isEnabled = false;
+          unit.colorFondo = Colors.grey;
+      }
+    }
+
+    return units;
+  } catch (e) {
+    // Manejo del error
+    throw Exception('Ocurrió un error al obtener las unidades: $e');
+  }
+}
+
 }

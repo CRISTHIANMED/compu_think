@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, library_private_types_in_public_api
 
 import 'package:compu_think/controllers/auth_controller.dart';
 import 'package:compu_think/controllers/unit_controller.dart';
@@ -9,7 +9,6 @@ class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _LoginPageState createState() => _LoginPageState();
 }
 
@@ -19,9 +18,9 @@ class _LoginPageState extends State<LoginPage> {
   final AuthController _authController = AuthController();
   final UnitController _unitController = UnitController();
 
-
   bool _obscureText = true;
   String _errorMessage = '';
+  bool _isLoading = false; // Controla el estado de carga
 
   @override
   void initState() {
@@ -38,6 +37,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _login() async {
+
     String email = _emailController.text.trim().toLowerCase();
     String password = _passwordController.text.trim();
 
@@ -48,6 +48,11 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
+    setState(() {
+      _isLoading = true; // Muestra el indicador de carga
+      _errorMessage = '';
+    });
+
     try {
       bool success = await _authController.login(email, password);
 
@@ -56,12 +61,12 @@ class _LoginPageState extends State<LoginPage> {
         if (!mounted) return;
 
         final prefs = await SharedPreferences.getInstance();
-        final idString = prefs.getString('id'); // Recupera el valor como String
-        final int idPersona = idString != null ? int.parse(idString) : 0; // Convierte a int o asigna 0 si es nulo
+        final idString = prefs.getString('id');
+        final int idPersona = idString != null ? int.parse(idString) : 0;
 
         final idsUnidades = await _unitController.fetchAllUnitIds();
-        
-        _unitController.initializeUserUnits(idPersona,idsUnidades);
+
+        _unitController.initializeUserUnits(idPersona, idsUnidades);
         Navigator.pushReplacementNamed(context, '/Unidad');
       } else {
         setState(() {
@@ -71,6 +76,10 @@ class _LoginPageState extends State<LoginPage> {
     } catch (e) {
       setState(() {
         _errorMessage = 'Ocurrió un error al intentar iniciar sesión: $e';
+      });
+    } finally {
+      setState(() {
+        _isLoading = false; // Oculta el indicador de carga
       });
     }
   }
@@ -83,58 +92,73 @@ class _LoginPageState extends State<LoginPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset(
+            if (_isLoading) ...[
+              const Expanded(
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CircularProgressIndicator(),
+                      SizedBox(height: 16),
+                      Text('Iniciando sesión, por favor espere...'),
+                    ],
+                  ),
+                ),
+              )
+            ] else ...[
+              Image.asset(
               'assets/images/logo2.png',
               height: 120,
             ),
             const SizedBox(height: 50),
-            TextField(
-              controller: _emailController,
-              decoration: InputDecoration(
-                labelText: 'Correo electrónico o Username',
-                prefixIcon: const Icon(Icons.mail),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _passwordController,
-              obscureText: _obscureText,
-              autofillHints: const [],
-              decoration: InputDecoration(
-                labelText: 'Contraseña',
-                prefixIcon: const Icon(Icons.lock),
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    _obscureText ? Icons.visibility_off : Icons.visibility,
+              TextField(
+                controller: _emailController,
+                decoration: InputDecoration(
+                  labelText: 'Correo electrónico o Username',
+                  prefixIcon: const Icon(Icons.mail),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
                   ),
-                  onPressed: () {
-                    setState(() {
-                      _obscureText = !_obscureText;
-                    });
-                  },
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
                 ),
               ),
-            ),
-            const SizedBox(height: 30),
-            ElevatedButton(
-              onPressed: _login,
-              child: const Text('Iniciar sesión'),
-            ),
-            if (_errorMessage.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(top: 20),
-                child: Text(
-                  _errorMessage,
-                  style: const TextStyle(color: Colors.red),
-                  textAlign: TextAlign.center,
+              const SizedBox(height: 16),
+              TextField(
+                controller: _passwordController,
+                obscureText: _obscureText,
+                autofillHints: const [],
+                decoration: InputDecoration(
+                  labelText: 'Contraseña',
+                  prefixIcon: const Icon(Icons.lock),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscureText ? Icons.visibility_off : Icons.visibility,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscureText = !_obscureText;
+                      });
+                    },
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
                 ),
               ),
+              const SizedBox(height: 30),
+              ElevatedButton(
+                onPressed: _login,
+                child: const Text('Iniciar sesión'),
+              ),
+              if (_errorMessage.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 20),
+                  child: Text(
+                    _errorMessage,
+                    style: const TextStyle(color: Colors.red),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+            ],
           ],
         ),
       ),

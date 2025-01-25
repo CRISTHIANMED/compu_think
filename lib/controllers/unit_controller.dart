@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_print
 
 import 'package:compu_think/models/entities/unit_entity.dart';
+import 'package:compu_think/models/entities/view_detail_unit_entity.dart';
 import 'package:compu_think/models/repositories/user_unit_repository.dart';
 import 'package:compu_think/models/repositories/unit_repository.dart';
 
@@ -67,6 +68,19 @@ class UnitController {
       // Manejo de errores
       throw Exception(
           'Ocurrió un error al inicializar las unidades del usuario: $e');
+    }
+  }
+
+  Future<List<ViewDetailUnitEntity>> fetchUnitsByPersonId(int personId) async {
+    try {
+      // Llama al método del repositorio para obtener las unidades
+      final units = await _unitRepository.getUnitsByPersonId(personId);
+
+      // Si necesitas realizar lógica adicional en el controlador, la agregas aquí
+      return units;
+    } catch (e) {
+      // Manejo del error
+      throw Exception('Ocurrió un error al obtener las unidades: $e');
     }
   }
 }
