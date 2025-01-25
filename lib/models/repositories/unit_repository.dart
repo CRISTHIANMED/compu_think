@@ -8,18 +8,62 @@ class UnitRepository {
   Future<List<UnitEntity>> fetchAll() async {
     try {
       // Realiza la consulta a la tabla 'unidad'
-      final response = await supabase.from('unidad').select();
+      final response = await supabase
+          .from('unidad')
+          .select()
+          .order('orden', ascending: true); 
 
-      // Verifica si la respuesta no está vacía
-      if (response.isNotEmpty) {
-        // Convierte la respuesta a una lista de objetos UnitEntity
-        return response.map((map) => UnitEntity.fromMap(map)).toList();
+      if (response.isEmpty) {
+        return [];
       }
-      // Si la respuesta está vacía, devuelve una lista vacía
-      return [];
+
+      return response
+        .map((map) => UnitEntity.fromMap(map))
+        .toList();
+
     } catch (e) {
       // Manejo de errores, si algo falla en la consulta o en el mapeo
       throw Exception(e);
+    }
+  }
+
+  // Método para obtener solo los IDs de todas las unidades, ordenados por 'orden'
+  Future<List<int>> fetchAllUnitIds() async {
+    try {
+      // Realiza la consulta a la tabla 'unidad' y selecciona solo el campo 'id'
+      final response = await supabase
+          .from('unidad')
+          .select('id')
+          .order('orden', ascending: true); 
+
+      if (response.isEmpty) {
+        return [];
+      }
+
+      // Mapea los resultados y devuelve solo los IDs como una lista de enteros
+      return (response as List)
+          .map((map) => map['id'] as int)
+          .toList();
+
+    } catch (e) {
+      // Manejo de errores
+      throw Exception('Error al obtener los IDs de las unidades: $e');
+    }
+  }
+
+  /// Obtiene una unidad específica por su ID
+  Future<UnitEntity?> fetchUnitById(int id) async {
+    try {
+      final response = await supabase
+        .from('unidad')
+        .select()
+        .eq('id', id)
+        .single();
+
+      return UnitEntity.fromMap(response);
+      
+    } catch (e) {
+      throw Exception('Error al obtener la unidad con id $id: $e');
     }
   }
 }

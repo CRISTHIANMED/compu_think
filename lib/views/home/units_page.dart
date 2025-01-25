@@ -1,5 +1,6 @@
 import 'package:compu_think/controllers/unit_controller.dart';
 import 'package:compu_think/models/repositories/unit_repository.dart';
+import 'package:compu_think/models/repositories/user_unit_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:compu_think/models/entities/unit_entity.dart';
 import 'package:compu_think/utils/widgets/custom_bottom_navigation_bar.dart';
@@ -12,7 +13,7 @@ class UnitsPage extends StatefulWidget {
 }
 
 class _UnitsPageState extends State<UnitsPage> {
-  late UnitController _unitController;
+  final UnitController _unitController = UnitController() ;
   List<UnitEntity> _unidades = [];
   bool _isLoading = true;
   String _errorMessage = '';
@@ -21,8 +22,6 @@ class _UnitsPageState extends State<UnitsPage> {
   @override
   void initState() {
     super.initState();
-    _unitController = UnitController(UnitRepository());
-
     // Cargar las unidades al iniciar la página
     fetchUnits();
   }

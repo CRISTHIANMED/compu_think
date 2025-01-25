@@ -33,7 +33,7 @@ class AuthController {
         final dataToStore = {
           'email': persona.email,
           'password': persona.contrasena,
-          'id': persona.contrasena,
+          'id': persona.id.toString(),
           'nombre1': persona.nombre1,
           'nombre2': persona.nombre2 ?? '',
           'apellido1': persona.apellido1 ?? '',

@@ -1,5 +1,9 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:compu_think/controllers/auth_controller.dart';
+import 'package:compu_think/controllers/unit_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -13,6 +17,8 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final AuthController _authController = AuthController();
+  final UnitController _unitController = UnitController();
+
 
   bool _obscureText = true;
   String _errorMessage = '';
@@ -48,6 +54,14 @@ class _LoginPageState extends State<LoginPage> {
       if (success) {
         await _authController.storeCredentials(email, password);
         if (!mounted) return;
+
+        final prefs = await SharedPreferences.getInstance();
+        final idString = prefs.getString('id'); // Recupera el valor como String
+        final int idPersona = idString != null ? int.parse(idString) : 0; // Convierte a int o asigna 0 si es nulo
+
+        final idsUnidades = await _unitController.fetchAllUnitIds();
+        
+        _unitController.initializeUserUnits(idPersona,idsUnidades);
         Navigator.pushReplacementNamed(context, '/Unidad');
       } else {
         setState(() {

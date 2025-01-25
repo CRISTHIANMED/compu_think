@@ -16,10 +16,10 @@ class UnitEntity {
   // Factory para convertir un mapa (de la base de datos) a una entidad Unidad
   factory UnitEntity.fromMap(Map<String, dynamic> map) {
     return UnitEntity(
-      id: map['id'],
-      nombre: map['nombre'],
-      descripcion: map['descripcion'],
-      orden: map['orden'],
+      id: map['id'] as int,
+      nombre: map['nombre'] as String,
+      descripcion: map['descripcion'] as String,
+      orden: map['orden'] as int,
       urlImagen: map['url_imagen'],
     );
   }
