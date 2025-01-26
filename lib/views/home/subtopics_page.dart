@@ -5,13 +5,13 @@ import 'package:compu_think/views/home/challenges_page.dart';
 import 'package:flutter/material.dart';
 
 class SubtopicsPage extends StatefulWidget {
-  const SubtopicsPage({Key? key}) : super(key: key);
+  const SubtopicsPage({super.key});
 
   @override
-  _SubtopicsPageState createState() => _SubtopicsPageState();
+  SubtopicsPageState createState() => SubtopicsPageState();
 }
 
-class _SubtopicsPageState extends State<SubtopicsPage> {
+class SubtopicsPageState extends State<SubtopicsPage> {
   final SubtopicController _controller = SubtopicController();
 
   List<SubtopicEntity> _subtemas = [];
@@ -22,7 +22,6 @@ class _SubtopicsPageState extends State<SubtopicsPage> {
   late String nombre;
   late String descripcion;
   late String titulo;
-
 
   @override
   void didChangeDependencies() {
@@ -52,16 +51,20 @@ class _SubtopicsPageState extends State<SubtopicsPage> {
   Future<void> _fetchSubtemas() async {
     try {
       final subtemas = await _controller.fetchTemasByUnidadId(idUnidad);
-      setState(() {
-        _subtemas = subtemas;
-        _isLoading = false;
-        _errorMessage = null;
-      });
+      if (mounted) {
+        setState(() {
+          _subtemas = subtemas;
+          _isLoading = false;
+          _errorMessage = null;
+        });
+      }
     } catch (e) {
-      setState(() {
-        _errorMessage = 'Error al cargar los subtemas: $e';
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'Error al cargar los subtemas: $e';
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -172,6 +175,7 @@ class _SubtopicsPageState extends State<SubtopicsPage> {
       context,
       '/Contenido',
       arguments: {
+        'idTema': subtema.id,
         'idUnidad': subtema.idUnidad,
         'titulo': subtema.titulo,
       },

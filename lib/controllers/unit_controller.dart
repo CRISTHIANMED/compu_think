@@ -71,10 +71,10 @@ class UnitController {
     }
   }
 
-  Future<List<ViewDetailUnitEntity>> fetchUnitsByPersonId(int personId) async {
+  Future<List<ViewDetailUnitEntity>> fetchUnitsViewByPersonId(int personId) async {
     try {
       // Llama al método del repositorio para obtener las unidades
-      final units = await _unitRepository.getUnitsByPersonId(personId);
+      final units = await _unitRepository.fetchUnitsViewByPersonId(personId);
 
       // Si necesitas realizar lógica adicional en el controlador, la agregas aquí
       return units;

@@ -69,7 +69,7 @@ class UnitRepository {
     }
   }
 
-  Future<List<ViewDetailUnitEntity>> getUnitsByPersonId(int personId) async {
+  Future<List<ViewDetailUnitEntity>> fetchUnitsViewByPersonId(int personId) async {
   try {
     // Realiza la consulta a Supabase
     final response = await Supabase.instance.client

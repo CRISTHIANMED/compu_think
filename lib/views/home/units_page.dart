@@ -8,10 +8,10 @@ class UnitsPage extends StatefulWidget {
   const UnitsPage({super.key});
 
   @override
-  _UnitsPageState createState() => _UnitsPageState();
+  UnitsPageState createState() => UnitsPageState();
 }
 
-class _UnitsPageState extends State<UnitsPage> {
+class UnitsPageState extends State<UnitsPage> {
   final UnitController _unitController = UnitController();
   List<ViewDetailUnitEntity> _unidades = [];
   bool _isLoading = true;
@@ -31,16 +31,20 @@ class _UnitsPageState extends State<UnitsPage> {
       final idString = prefs.getString('id');
       final int idPersona = idString != null ? int.parse(idString) : 0;
 
-      final unidades = await _unitController.fetchUnitsByPersonId(idPersona);
-      setState(() {
-        _unidades = unidades;
-        _isLoading = false;
-      });
+      final unidades = await _unitController.fetchUnitsViewByPersonId(idPersona);
+      if (mounted) {
+        setState(() {
+          _unidades = unidades;
+          _isLoading = false;
+        });
+      }
     } catch (e) {
-      setState(() {
-        _isLoading = false;
-        _errorMessage = e.toString();
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _errorMessage = e.toString();
+        });
+      }
     }
   }
 
@@ -151,9 +155,11 @@ class _UnitsPageState extends State<UnitsPage> {
                                                 '/Tema',
                                                 arguments: {
                                                   'id_unidad': unidad.idUnidad,
-                                                  'titulo': 'Unidad ${unidad.unidadOrden}',
+                                                  'titulo':
+                                                      'Unidad ${unidad.unidadOrden}',
                                                   'nombre': unidad.unidadNombre,
-                                                  'descripcion': unidad.unidadDescripcion,
+                                                  'descripcion':
+                                                      unidad.unidadDescripcion,
                                                 },
                                               );
                                             }

@@ -59,24 +59,23 @@ class _ChallengePageState extends State<ChallengePage> {
   Widget _buildRetoCard(BuildContext context, int index) {
     String retoNombre = '';
     String retoDescripcion = '';
-    String retoPdfUrl = '';
 
     // Asignación de nombres, descripciones y enlaces para cada reto
     switch (index) {
       case 0:
         retoNombre = 'Reto 1: Test';
         retoDescripcion = 'Un reto en el que pondrás a prueba tus conocimientos mediante un test interactivo.';
-        retoPdfUrl = 'https://example.com/reto1_test.pdf'; // Enlace al PDF del reto 1
+// Enlace al PDF del reto 1
         break;
       case 1:
         retoNombre = 'Reto 2: Debate';
         retoDescripcion = 'Participa en un debate sobre temas relevantes y presenta tus argumentos de manera clara.';
-        retoPdfUrl = 'https://example.com/reto2_debate.pdf'; // Enlace al PDF del reto 2
+// Enlace al PDF del reto 2
         break;
       case 2:
         retoNombre = 'Reto 3: Juego';
         retoDescripcion = 'Completa un juego interactivo basado en los conceptos de la unidad.';
-        retoPdfUrl = 'https://example.com/reto3_juego.pdf'; // Enlace al PDF del reto 3
+// Enlace al PDF del reto 3
         break;
     }
 

@@ -13,7 +13,7 @@ class SubtopicEntity {
     //required this.vigente,
   });
 
-  // Factory para convertir un mapa (de la base de datos) a una entidad Unidad
+  // Metodo para convertir un mapa (de la base de datos) a una entidad Unidad
   factory SubtopicEntity.fromMap(Map<String, dynamic> map) {
     return SubtopicEntity(
       id: map['id'] as int,
