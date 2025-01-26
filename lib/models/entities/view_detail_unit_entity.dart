@@ -12,7 +12,7 @@ class ViewDetailUnitEntity {
   final String unidadVigente;
   final String unidadUrlImagen;
   final String tipoEstadoDescripcion;
-  Color colorFondo = Colors.grey;  // Nueva propiedad para color de fondo
+  Color colorFondo;  // Nueva propiedad para color de fondo
   bool? isEnabled;     // Nueva propiedad para habilitación
 
   ViewDetailUnitEntity({

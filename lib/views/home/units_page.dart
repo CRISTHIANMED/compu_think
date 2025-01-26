@@ -146,8 +146,16 @@ class _UnitsPageState extends State<UnitsPage> {
                                     child: ElevatedButton(
                                       onPressed: isEnabled
                                           ? () {
-                                              Navigator.pushReplacementNamed(
-                                                  context, '/Tema');
+                                              Navigator.pushNamed(
+                                                context,
+                                                '/Tema',
+                                                arguments: {
+                                                  'id_unidad': unidad.idUnidad,
+                                                  'titulo': 'Unidad ${unidad.unidadOrden}',
+                                                  'nombre': unidad.unidadNombre,
+                                                  'descripcion': unidad.unidadDescripcion,
+                                                },
+                                              );
                                             }
                                           : null,
                                       child: const Text('Ver'),

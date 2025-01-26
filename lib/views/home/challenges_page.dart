@@ -92,7 +92,7 @@ class _ChallengePageState extends State<ChallengePage> {
           ),
         ),
         onPressed: () {
-          _navigateToContentScreen(context, retoNombre, retoDescripcion, retoPdfUrl);
+          //_navigateToContentScreen(context, retoNombre, retoDescripcion, retoPdfUrl);
         },
         child: Padding(
           padding: const EdgeInsets.all(12.0),
@@ -116,7 +116,7 @@ class _ChallengePageState extends State<ChallengePage> {
   }
 
   // Método para navegar a la pantalla de contenido
-  void _navigateToContentScreen(
+  /*void _navigateToContentScreen(
       BuildContext context, String nombreReto, String descripcionReto, String pdfUrl) {
     Navigator.push(
       context,
@@ -124,9 +124,8 @@ class _ChallengePageState extends State<ChallengePage> {
         builder: (context) => ContentsPage(
           unidadTitulo: "Unidad 1",
           subtemaNombre: nombreReto, // Nombre del reto
-          pdfUrl: pdfUrl, // Enlace al PDF del reto
         ),
       ),
     );
-  }
+  }*/
 }

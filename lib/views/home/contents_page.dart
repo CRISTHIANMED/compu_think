@@ -3,16 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 
 class ContentsPage extends StatelessWidget {
-  final String unidadTitulo;
-  final String subtemaNombre;
-  final String pdfUrl;
+  final String unidadTitulo = 'unidad';
+  final String subtemaNombre = 'subtema';
+  final String pdfUrl = '';
 
-  const ContentsPage({
-    super.key,
-    required this.unidadTitulo,
-    required this.subtemaNombre,
-    required this.pdfUrl,
-  });
+  const ContentsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -21,6 +16,7 @@ class ContentsPage extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: Text(subtemaNombre),
+          backgroundColor: Colors.blue,
           centerTitle: true,
           bottom: const TabBar(
             tabs: [

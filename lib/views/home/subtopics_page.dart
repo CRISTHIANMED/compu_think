@@ -1,195 +1,189 @@
+import 'package:compu_think/controllers/subtopic_controller.dart';
+import 'package:compu_think/models/entities/subtopic_entity.dart';
 import 'package:compu_think/utils/widgets/custom_bottom_navigation_bar.dart';
+import 'package:compu_think/views/home/challenges_page.dart';
 import 'package:flutter/material.dart';
-import 'package:compu_think/views/home/contents_page.dart';
-import 'package:compu_think/views/home/challenges_page.dart';  // Asegúrate de importar RetosScreen
-
-List<Map<String, dynamic>> subtemasData = [
-  {
-    "id": 1,
-    "nombre": "Introducción a Flutter",
-    "descripcion":
-        "Conceptos básicos de Flutter, estructuras, y widgets principales."
-  },
-  {
-    "id": 2,
-    "nombre": "Estructuras de Datos",
-    "descripcion":
-        "Estudio de estructuras de datos como listas, pilas, colas, árboles, y más."
-  },
-  {
-    "id": 3,
-    "nombre": "Desarrollo Web con Dart",
-    "descripcion":
-        "Introducción a Dart y su uso para desarrollar aplicaciones web."
-  },
-];
 
 class SubtopicsPage extends StatefulWidget {
-  const SubtopicsPage({super.key});
+  const SubtopicsPage({Key? key}) : super(key: key);
 
   @override
-  // ignore: library_private_types_in_public_api
   _SubtopicsPageState createState() => _SubtopicsPageState();
 }
 
 class _SubtopicsPageState extends State<SubtopicsPage> {
-  final int _currentIndex = 0;
-  late List<Subtema> _subtemas;
+  final SubtopicController _controller = SubtopicController();
+
+  List<SubtopicEntity> _subtemas = [];
+  bool _isLoading = true;
+  String? _errorMessage;
+
+  late int idUnidad;
+  late String nombre;
+  late String descripcion;
+  late String titulo;
+
 
   @override
-  void initState() {
-    super.initState();
-    _subtemas = _parseJsonData(subtemasData);
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _loadArguments();
+    _fetchSubtemas();
   }
 
-  List<Subtema> _parseJsonData(List<Map<String, dynamic>> data) {
-    return data.map((json) => Subtema.fromJson(json)).toList();
+  // Cargar los argumentos de la navegación
+  void _loadArguments() {
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    if (args != null) {
+      idUnidad = args['id_unidad'] as int;
+      nombre = args['nombre'] as String;
+      descripcion = args['descripcion'] as String;
+      titulo = args['titulo'] as String;
+    } else {
+      idUnidad = 0;
+      nombre = 'Nombre no disponible';
+      descripcion = 'Descripción no disponible';
+      titulo = 'Título no disponible';
+    }
+  }
+
+  // Cargar los subtemas desde el controlador
+  Future<void> _fetchSubtemas() async {
+    try {
+      final subtemas = await _controller.fetchTemasByUnidadId(idUnidad);
+      setState(() {
+        _subtemas = subtemas;
+        _isLoading = false;
+        _errorMessage = null;
+      });
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Error al cargar los subtemas: $e';
+        _isLoading = false;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Unidad 1"),
+        title: const Text("Temas"),
+        backgroundColor: Colors.blue,
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pushReplacementNamed(context, '/Unidad');
+            Navigator.pop(context);
           },
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(30.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Text(
-              "Unidad 1",
-              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 10),
-            const Text(
-              "Introducción al Tema",
-              style: TextStyle(fontSize: 22, color: Colors.grey),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 30),
-
-            Expanded(
-              child: ListView.builder(
-                itemCount: _subtemas.length,
-                itemBuilder: (context, index) {
-                  final subtema = _subtemas[index];
-                  return _buildSubtemaCard(subtema, context);
-                },
-              ),
-            ),
-            
-            // Botón "Retos" al final de la lista de subtemas
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  backgroundColor: Colors.orangeAccent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                onPressed: () {
-                  _navigateToRetosScreen(context); // Navegar a la página de retos
-                },
-                child: const Padding(
-                  padding: EdgeInsets.all(12.0),
-                  child: Text(
-                    "Retos",
-                    style: TextStyle(fontSize: 18, color: Colors.white),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
+        padding: const EdgeInsets.all(16.0),
+        child: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : _errorMessage != null
+                ? Center(
+                    child: Text(
+                      _errorMessage!,
+                      style: const TextStyle(color: Colors.red, fontSize: 16),
+                      textAlign: TextAlign.center,
+                    ),
+                  )
+                : _buildSubtopicsList(),
       ),
-      bottomNavigationBar: CustomBottomNavigationBar(
-        currentIndex: _currentIndex,
-      ),
+      bottomNavigationBar: const CustomBottomNavigationBar(currentIndex: 0),
     );
   }
 
-  Widget _buildSubtemaCard(Subtema subtema, BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 20),
-          backgroundColor: Colors.blueAccent,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+  Widget _buildSubtopicsList() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          titulo,
+          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          nombre,
+          style: const TextStyle(fontSize: 18, color: Colors.grey),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 16),
+        Expanded(
+          child: ListView.builder(
+            itemCount: _subtemas.length,
+            itemBuilder: (context, index) {
+              final subtema = _subtemas[index];
+              return _buildSubtemaCard(subtema, context);
+            },
           ),
         ),
-        onPressed: () {
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.orangeAccent,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          onPressed: () {
+            _navigateToRetosScreen(context);
+          },
+          child: const Padding(
+            padding: EdgeInsets.all(12.0),
+            child: Text(
+              "Retos",
+              style: TextStyle(fontSize: 16, color: Colors.white),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSubtemaCard(SubtopicEntity subtema, BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: ListTile(
+        contentPadding: const EdgeInsets.all(16.0),
+        title: Text(
+          subtema.titulo,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        /*subtitle: Text(
+          "Orden: ${subtema.orden}",
+          style: const TextStyle(fontSize: 14, color: Colors.grey),
+        ),*/
+        onTap: () {
           _navigateToContentScreen(context, subtema);
         },
-        child: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                subtema.nombre,
-                style: const TextStyle(fontSize: 18, color: Colors.white),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                subtema.descripcion,
-                style: const TextStyle(fontSize: 14, color: Colors.white70),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }
 
-  void _navigateToContentScreen(BuildContext context, Subtema subtema) {
-    Navigator.push(
+  void _navigateToContentScreen(BuildContext context, SubtopicEntity subtema) {
+    Navigator.pushNamed(
       context,
-      MaterialPageRoute(
-        builder: (context) => ContentsPage(
-          unidadTitulo: "Unidad 1",
-          subtemaNombre: subtema.nombre,
-          pdfUrl: "https://departamento.us.es/edan/php/asig/LICFIS/LFIPC/Tema2FISPC0809.pdf",
-        ),
-      ),
+      '/Contenido',
+      arguments: {
+        'idUnidad': subtema.idUnidad,
+        'titulo': subtema.titulo,
+      },
     );
   }
 
-  // Método para navegar a la pantalla de retos
   void _navigateToRetosScreen(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => const ChallengePage(),
       ),
-    );
-  }
-}
-
-class Subtema {
-  final int id;
-  final String nombre;
-  final String descripcion;
-
-  Subtema({required this.id, required this.nombre, required this.descripcion});
-
-  factory Subtema.fromJson(Map<String, dynamic> json) {
-    return Subtema(
-      id: json['id'],
-      nombre: json['nombre'],
-      descripcion: json['descripcion'],
     );
   }
 }

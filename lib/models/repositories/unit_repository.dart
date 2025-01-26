@@ -75,7 +75,8 @@ class UnitRepository {
     final response = await Supabase.instance.client
         .from('vista_detalles_unidad') // Nombre de tu vista
         .select()
-        .eq('id_persona', personId);
+        .eq('id_persona', personId)
+        .order('unidad_orden', ascending: true); 
 
     // Convertir los datos obtenidos a objetos ViewDetailUnitEntity
     List<ViewDetailUnitEntity> units = [];
@@ -92,7 +93,7 @@ class UnitRepository {
           break;
         case 'no_completado':
           unit.isEnabled = false;
-          unit.colorFondo = const Color.fromARGB(255, 236, 126, 126) ;
+          unit.colorFondo = const Color.fromARGB(255, 173, 171, 171) ;
           break;
         case 'completado':
           unit.isEnabled = true;
@@ -100,7 +101,7 @@ class UnitRepository {
           break;
         default:
           unit.isEnabled = false;
-          unit.colorFondo = Colors.grey;
+          unit.colorFondo = const Color.fromARGB(255, 107, 106, 106);
       }
     }
 
