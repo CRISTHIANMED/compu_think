@@ -72,7 +72,11 @@ class SubtopicsPageState extends State<SubtopicsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Temas"),
+        title: const Row(
+          children: [
+            Text("Temas"),
+          ],
+        ),
         backgroundColor: Colors.blue,
         centerTitle: true,
         leading: IconButton(
@@ -96,6 +100,7 @@ class SubtopicsPageState extends State<SubtopicsPage> {
                   )
                 : _buildSubtopicsList(),
       ),
+      
       bottomNavigationBar: const CustomBottomNavigationBar(currentIndex: 0),
     );
   }

@@ -31,10 +31,8 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Tabla Unidad'),
-      ),
-      body: FutureBuilder(
+      body: 
+      FutureBuilder(
         future: _future,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -59,7 +57,7 @@ class _HomePageState extends State<HomePage> {
             );
           }
         },
-      ),
+      )
     );
   }
 }

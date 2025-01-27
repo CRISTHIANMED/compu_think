@@ -1,14 +1,13 @@
-// ignore_for_file: library_private_types_in_public_api
-
-import 'package:compu_think/utils/widgets/custom_bottom_navigation_bar.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_pdfview/flutter_pdfview.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:http/http.dart' as http;
 import 'dart:io';
 
-class ContentsPage extends StatefulWidget {
+import 'package:compu_think/utils/widgets/audio_viewer_page.dart';
+import 'package:compu_think/utils/widgets/custom_bottom_navigation_bar.dart';
+import 'package:compu_think/utils/widgets/media_item.dart';
+import 'package:compu_think/utils/widgets/pdf_viewer_page.dart';
+import 'package:compu_think/utils/widgets/video_viewer_page.dart';
+import 'package:flutter/material.dart';
 
+class ContentsPage extends StatefulWidget {
   const ContentsPage({super.key});
 
   @override
@@ -16,12 +15,44 @@ class ContentsPage extends StatefulWidget {
 }
 
 class _ContentsPageState extends State<ContentsPage> {
-  final String unidadTitulo = 'unidad';
+  final String subtemaNombre = 'Titulo Subtema';
 
-  final String subtemaNombre = 'subtema';
-
-  final String pdfUrl =
-      'https://departamento.us.es/edan/php/asig/LICFIS/LFIPC/Tema2FISPC0809.pdf';
+  // Lista de contenidos multimedia
+  final List<Map<String, dynamic>> multimediaContent = [
+    {
+      'type': 'video',
+      'url': 'https://www.youtube.com/watch?v=dQw4w9WgXcQl',
+      'name': 'Video de Ejemplo 1'
+    },
+    {
+      'type': 'audio',
+      'url': 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+      'name': 'Audio de Ejemplo 1'
+    },
+    {
+      'type': 'audio',
+      'url':
+          'https://drive.google.com/uc?export=view&id=1Q6ZYn6Nj5XF-GsRs_X81w3rzPiu-GjZv',
+      'name': 'Audio de Ejemplo 15'
+    },
+    {
+      'type': 'video',
+      'url': 'https://www.youtube.com/watch?v=kZfuJvkdcHU&t=10s',
+      'name': 'Video de Ejemplo 2'
+    },
+    {
+      'type': 'pdf',
+      'name': 'Tema 1',
+      'url':
+          'https://departamento.us.es/edan/php/asig/LICFIS/LFIPC/Tema2FISPC0809.pdf'
+    },
+    {
+      'type': 'pdf',
+      'name': 'Tema 2',
+      'url':
+          'https://departamento.us.es/edan/php/asig/LICFIS/LFIPC/Tema2FISPC0809.pdf'
+    },
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +60,11 @@ class _ContentsPageState extends State<ContentsPage> {
       length: 2, // Número de pestañas
       child: Scaffold(
         appBar: AppBar(
-          title: Text(subtemaNombre),
+          title: Row(
+            children: [
+              Text(subtemaNombre),
+            ],
+          ),
           backgroundColor: Colors.blue,
           centerTitle: true,
           bottom: const TabBar(
@@ -48,167 +83,59 @@ class _ContentsPageState extends State<ContentsPage> {
         body: TabBarView(
           children: [
             // Pestaña de multimedia
-            Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    "Contenido Multimedia",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Acción para reproducir un video o audio
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text("Reproduciendo video o audio...")),
-                      );
+            ListView.builder(
+              itemCount: multimediaContent.length,
+              itemBuilder: (context, index) {
+                final content = multimediaContent[index];
+                // Validar si 'url' es null o vacío
+                if (content['url'] == null || content['url']!.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+                if (content['type'] == 'video' || content['type'] == 'audio') {
+                  return MediaItem(
+                    name: content['name'] ?? '',
+                    type: content['type'],
+                    pageRoute: (context) {
+                      if (content['type'] == 'video') {
+                        // Si es video, devuelve la ruta para el reproductor de video
+                        return VideoViewerPage(
+                          videoUrl: content['url'],
+                          nombre: content['name'] ?? '',
+                        );
+                      } else if (content['type'] == 'audio') {
+                        // Si es audio, devuelve la ruta para el reproductor de audio
+                        return AudioViewerPage(
+                          audioUrl: content['url'],
+                          nombre: content['name'] ?? '',
+                        );
+                      }
+                      return Container(); // No debería llegar aquí si se valida correctamente el tipo
                     },
-                    child: const Text("Reproducir Video/Audio"),
-                  ),
-                ],
-              ),
-            ),
-
-            // Pestaña de PDF
-            Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => PDFViewerPage(pdfUrl: pdfUrl),
-                    ),
                   );
-                },
-                child: const Text("Abrir PDF"),
-              ),
+                }
+                return null; // Si no es video ni audio, no retorna nada
+              },
             ),
+            // Pestaña de PDF
+            ListView.builder(
+              itemCount: multimediaContent.length,
+              itemBuilder: (context, index) {
+                final content = multimediaContent[index];
+                // Asegúrate de validar que el contenido tenga el nombre y la URL
+                if (content['url'] == null || content['url']!.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+                return MediaItem(
+                  name: content['name'] ?? '',
+                  type: content['type'],
+                  pageRoute: (context) => PdfViewerPage(pdfUrl: content['url']),
+                );
+              },
+            )
           ],
         ),
-        bottomNavigationBar: const CustomBottomNavigationBar(
-          currentIndex: 0,
-        ),
+        bottomNavigationBar: const CustomBottomNavigationBar(currentIndex: 0),
       ),
-    );
-  }
-}
-
-class PDFViewerPage extends StatefulWidget {
-  final String pdfUrl;
-
-  const PDFViewerPage({super.key, required this.pdfUrl});
-
-  @override
-  PDFViewerPageState createState() => PDFViewerPageState();
-}
-
-class PDFViewerPageState extends State<PDFViewerPage> {
-  String? localPath;
-  bool isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _downloadAndSavePdf();
-  }
-
-  Future<void> _downloadAndSavePdf() async {
-    try {
-      final response = await http.get(Uri.parse(widget.pdfUrl));
-      if (response.statusCode == 200) {
-        final directory = await getApplicationDocumentsDirectory();
-        final file = File('${directory.path}/temp.pdf');
-        await file.writeAsBytes(response.bodyBytes);
-        setState(() {
-          localPath = file.path;
-          isLoading = false;
-        });
-      } else {
-        throw Exception("Error al descargar el PDF");
-      }
-    } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
-      _showErrorDialog(e.toString());
-    }
-  }
-
-  Future<void> _savePdfToDownloads() async {
-    try {
-      if (localPath != null) {
-        final directory = await getExternalStorageDirectory();
-        final downloadsDir = Directory('${directory?.path}/Descargas');
-        if (!await downloadsDir.exists()) {
-          await downloadsDir.create(recursive: true);
-        }
-        const fileName = 'documento_descargado.pdf';
-        final newFile = File('${downloadsDir.path}/$fileName');
-        await File(localPath!).copy(newFile.path);
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Archivo guardado en ${newFile.path}')),
-          );
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al guardar el archivo: $e')),
-        );
-      }
-    }
-  }
-
-  void _showErrorDialog(String message) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Error"),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("OK"),
-          ),
-        ],
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Vista de PDF"),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.download),
-            onPressed: _savePdfToDownloads,
-          ),
-        ],
-      ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : localPath != null
-              ? PDFView(
-                  filePath: localPath,
-                  enableSwipe: true,
-                  swipeHorizontal: true,
-                  autoSpacing: true,
-                  pageSnap: true,
-                  fitPolicy: FitPolicy.BOTH,
-                )
-              : const Center(
-                  child: Text("No se pudo cargar el PDF"),
-                ),
     );
   }
 }

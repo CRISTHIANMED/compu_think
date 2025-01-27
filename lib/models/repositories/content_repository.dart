@@ -1,11 +1,12 @@
 import 'package:compu_think/models/entities/content_entity.dart';
+import 'package:compu_think/models/entities/view_detail_content_entity.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ContentRepository {
   final supabase = Supabase.instance.client;
 
-  // Obtener temas por idUnidad
-  Future<List<ContentEntity>> fetchSubtopicByUnidadId(int idTema) async {
+  // Obtener contenido por tema
+  Future<List<ContentEntity>> fetchSubtopicByTemaId(int idTema) async {
     try {
       final response = await supabase.from('contenido')
             .select()
@@ -39,4 +40,24 @@ class ContentRepository {
       throw Exception('Error al consultar los contenidos por tema y tipo: $e');
     }
   }
+
+    /// Obtiene la lista de contenidos detalle filtrados por idTema
+  Future<List<ViewDetailContentEntity>> fetchContenidoDetalleByTemaId(int idTema) async {
+    try {
+      final response = await supabase
+          .from('contenido_detalle') // Nombre de la vista
+          .select()
+          .eq('tema_id', idTema)
+          .order('contenido_id', ascending: true);
+
+      final data = response as List<dynamic>;
+      return data
+          .map((item) => ViewDetailContentEntity.fromMap(item as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      throw Exception('Error al consultar los contenidos detalle: $e');
+    }
+  }
+
+
 }

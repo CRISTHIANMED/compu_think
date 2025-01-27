@@ -46,6 +46,10 @@ dependencies:
   connectivity_plus: ^6.1.2
   provider: ^6.1.2
   syncfusion_flutter_pdfviewer: ^28.1.41
+  just_audio: ^0.9.43
+  audioplayers: ^6.1.0
+  audio_session: ^0.1.23
+  rxdart: ^0.28.0
 
 dev_dependencies:
   flutter_test:
