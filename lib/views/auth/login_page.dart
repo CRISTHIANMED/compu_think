@@ -1,7 +1,9 @@
 // ignore_for_file: use_build_context_synchronously, library_private_types_in_public_api
 
 import 'package:compu_think/controllers/auth_controller.dart';
+import 'package:compu_think/controllers/challenge_controller.dart';
 import 'package:compu_think/controllers/unit_controller.dart';
+import 'package:compu_think/models/repositories/challenge_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -17,6 +19,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   final AuthController _authController = AuthController();
   final UnitController _unitController = UnitController();
+  final ChallengeController _challengeController = ChallengeController();
 
   bool _obscureText = true;
   String _errorMessage = '';
@@ -65,8 +68,9 @@ class _LoginPageState extends State<LoginPage> {
         final int idPersona = idString != null ? int.parse(idString) : 0;
 
         final idsUnidades = await _unitController.fetchAllUnitIds();
+        final idsRetos = await _challengeController.fetchAllChallengeIds();
 
-        _unitController.initializeUserUnits(idPersona, idsUnidades);
+        _unitController.initializeUserUnits(idPersona, idsUnidades, idsRetos);
         Navigator.pushReplacementNamed(context, '/Unidad');
       } else {
         setState(() {

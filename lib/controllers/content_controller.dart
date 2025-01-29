@@ -26,7 +26,7 @@ class ContentController {
   }
 
   // Obtener vista contenido detalle por idTema
-  Future<List<ViewDetailContentEntity>> getViewSubtopicDetailsByTema(int idTema) async {
+  Future<List<ViewDetailContentEntity>> getViewContenidoDetalleByTemaId(int idTema) async {
     try {
       final subtopics = await contentRepository.fetchContenidoDetalleByTemaId(idTema);
       return subtopics;
@@ -35,6 +35,4 @@ class ContentController {
     }
   }
 
-
-  
 }

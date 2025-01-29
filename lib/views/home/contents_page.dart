@@ -1,5 +1,8 @@
-import 'dart:io';
+// ignore_for_file: unused_field
 
+import 'package:compu_think/controllers/content_controller.dart';
+import 'package:compu_think/models/entities/view_detail_content_entity.dart';
+import 'package:compu_think/utils/helper/convert_google_drive_link.dart';
 import 'package:compu_think/utils/widgets/audio_viewer_page.dart';
 import 'package:compu_think/utils/widgets/custom_bottom_navigation_bar.dart';
 import 'package:compu_think/utils/widgets/media_item.dart';
@@ -16,43 +19,58 @@ class ContentsPage extends StatefulWidget {
 
 class _ContentsPageState extends State<ContentsPage> {
   final String subtemaNombre = 'Titulo Subtema';
+  final ContentController _contentController = ContentController();
+  List<ViewDetailContentEntity> _contenidos = [];
+  bool _isLoading = true;
+  String? _errorMessage;
 
-  // Lista de contenidos multimedia
-  final List<Map<String, dynamic>> multimediaContent = [
-    {
-      'type': 'video',
-      'url': 'https://www.youtube.com/watch?v=dQw4w9WgXcQl',
-      'name': 'Video de Ejemplo 1'
-    },
-    {
-      'type': 'audio',
-      'url': 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-      'name': 'Audio de Ejemplo 1'
-    },
-    {
-      'type': 'audio',
-      'url':
-          'https://drive.google.com/uc?export=view&id=1Q6ZYn6Nj5XF-GsRs_X81w3rzPiu-GjZv',
-      'name': 'Audio de Ejemplo 15'
-    },
-    {
-      'type': 'video',
-      'url': 'https://www.youtube.com/watch?v=kZfuJvkdcHU&t=10s',
-      'name': 'Video de Ejemplo 2'
-    },
-    {
-      'type': 'pdf',
-      'name': 'Tema 1',
-      'url':
-          'https://departamento.us.es/edan/php/asig/LICFIS/LFIPC/Tema2FISPC0809.pdf'
-    },
-    {
-      'type': 'pdf',
-      'name': 'Tema 2',
-      'url':
-          'https://departamento.us.es/edan/php/asig/LICFIS/LFIPC/Tema2FISPC0809.pdf'
-    },
-  ];
+  late int idTema;
+  late int idUnidad;
+  late String titulo;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _loadArguments();
+    _fetchContents();
+  }
+
+  // Cargar los argumentos de la navegación
+  void _loadArguments() {
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    if (args != null) {
+      idUnidad = args['idUnidad'] as int;
+      idTema = args['idTema'] as int;
+      titulo = args['titulo'] as String;
+    } else {
+      idUnidad = 0;
+      idTema = 0;
+      titulo = 'Título no disponible';
+    }
+  }
+
+  // Cargar los subtemas desde el controlador
+  Future<void> _fetchContents() async {
+    try {
+      final contenidos =
+          await _contentController.getViewContenidoDetalleByTemaId(idTema);
+      if (mounted) {
+        setState(() {
+          _contenidos = contenidos;
+          _isLoading = false;
+          _errorMessage = null;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'Error al cargar los subtemas: $e';
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +80,7 @@ class _ContentsPageState extends State<ContentsPage> {
         appBar: AppBar(
           title: Row(
             children: [
-              Text(subtemaNombre),
+              Text(titulo),
             ],
           ),
           backgroundColor: Colors.blue,
@@ -84,52 +102,83 @@ class _ContentsPageState extends State<ContentsPage> {
           children: [
             // Pestaña de multimedia
             ListView.builder(
-              itemCount: multimediaContent.length,
+              itemCount: _contenidos.length,
               itemBuilder: (context, index) {
-                final content = multimediaContent[index];
+                final content = _contenidos[index];
+
+                String url = content.contenidoUrl;
+                String nombre = content.contenidoNombre;
+                String tipoContenido = content.tipoContenidoNombre;
+
                 // Validar si 'url' es null o vacío
-                if (content['url'] == null || content['url']!.isEmpty) {
+                if (url.isEmpty) {
                   return const SizedBox.shrink();
                 }
-                if (content['type'] == 'video' || content['type'] == 'audio') {
+                if (tipoContenido == 'video' || tipoContenido == 'audio') {
                   return MediaItem(
-                    name: content['name'] ?? '',
-                    type: content['type'],
+                    name: nombre,
+                    type: tipoContenido,
                     pageRoute: (context) {
-                      if (content['type'] == 'video') {
+                      if (tipoContenido == 'video') {
                         // Si es video, devuelve la ruta para el reproductor de video
                         return VideoViewerPage(
-                          videoUrl: content['url'],
-                          nombre: content['name'] ?? '',
+                          videoUrl: url,
+                          nombre: nombre,
                         );
-                      } else if (content['type'] == 'audio') {
+                      } else if (tipoContenido == 'audio') {
                         // Si es audio, devuelve la ruta para el reproductor de audio
+                        // Validar si la URL es válida usando convertGoogleDriveLink
+                        try {
+                          url = convertGoogleDriveLink(
+                              url); // Intenta convertir la URL
+                        } catch (e) {
+                          return const Text(
+                            'URL no válida',
+                            style: TextStyle(color: Colors.red),
+                          );
+                        }
                         return AudioViewerPage(
-                          audioUrl: content['url'],
-                          nombre: content['name'] ?? '',
+                          audioUrl: url,
+                          nombre: nombre,
                         );
                       }
                       return Container(); // No debería llegar aquí si se valida correctamente el tipo
                     },
                   );
                 }
-                return null; // Si no es video ni audio, no retorna nada
+                return Container(); // Si no es video ni audio, no retorna nada
               },
             ),
             // Pestaña de PDF
             ListView.builder(
-              itemCount: multimediaContent.length,
+              itemCount: _contenidos.length,
               itemBuilder: (context, index) {
-                final content = multimediaContent[index];
+                final content = _contenidos[index];
+                String tipoContenido = content.tipoContenidoNombre;
+                String url = content.contenidoUrl;
+                String nombre = content.contenidoNombre;
                 // Asegúrate de validar que el contenido tenga el nombre y la URL
-                if (content['url'] == null || content['url']!.isEmpty) {
+                if (url.isEmpty) {
                   return const SizedBox.shrink();
                 }
-                return MediaItem(
-                  name: content['name'] ?? '',
-                  type: content['type'],
-                  pageRoute: (context) => PdfViewerPage(pdfUrl: content['url']),
-                );
+                if (tipoContenido == 'pdf') {
+                  // Validar si la URL es válida usando convertGoogleDriveLink
+                try {
+                  url = convertGoogleDriveLink(url); // Intenta convertir la URL
+                } catch (e) {
+                  return const Text(
+                    'URL no válida',
+                    style: TextStyle(color: Colors.red),
+                  );
+                }
+                  return MediaItem(
+                    name: nombre,
+                    type: tipoContenido,
+                    pageRoute: (context) =>
+                        PdfViewerPage(pdfUrl: url, nombre: nombre, tema:content.temaTitulo),
+                  );
+                }
+                return Container();
               },
             )
           ],

@@ -32,6 +32,9 @@ class MediaItem extends StatelessWidget {
     Color getColorByType(String type) {
       switch (type) {
         case 'pdf':
+
+
+
           return Colors.red;
         case 'video':
           return Colors.blue;

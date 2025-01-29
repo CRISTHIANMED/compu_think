@@ -1,5 +1,6 @@
 import 'package:compu_think/controllers/unit_controller.dart';
 import 'package:compu_think/models/entities/view_detail_unit_entity.dart';
+import 'package:compu_think/utils/helper/convert_google_drive_link.dart';
 import 'package:flutter/material.dart';
 import 'package:compu_think/utils/widgets/custom_bottom_navigation_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -31,7 +32,8 @@ class UnitsPageState extends State<UnitsPage> {
       final idString = prefs.getString('id');
       final int idPersona = idString != null ? int.parse(idString) : 0;
 
-      final unidades = await _unitController.fetchUnitsViewByPersonId(idPersona);
+      final unidades =
+          await _unitController.fetchUnitsViewByPersonId(idPersona);
       if (mounted) {
         setState(() {
           _unidades = unidades;
@@ -94,12 +96,8 @@ class UnitsPageState extends State<UnitsPage> {
                           Opacity(
                             opacity: isEnabled ? 1.0 : 0.5,
                             child: ClipOval(
-                              child: Image.network(
-                                convertGoogleDriveLink(unidad.unidadUrlImagen),
-                                width: 100,
-                                height: 100,
-                                fit: BoxFit.cover,
-                              ),
+                              child: 
+                                _buildImage(unidad.unidadUrlImagen),
                             ),
                           ),
                           const SizedBox(width: 16),
@@ -154,8 +152,9 @@ class UnitsPageState extends State<UnitsPage> {
                                                 context,
                                                 '/Tema',
                                                 arguments: {
+                                                  'id_persona': unidad.idPersona,
                                                   'id_unidad': unidad.idUnidad,
-                                                  'titulo':
+                                                  'tituloUnidad':
                                                       'Unidad ${unidad.unidadOrden}',
                                                   'nombre': unidad.unidadNombre,
                                                   'descripcion':
@@ -186,15 +185,26 @@ class UnitsPageState extends State<UnitsPage> {
     );
   }
 
-  String convertGoogleDriveLink(String sharedLink) {
-    final regex = RegExp(r'd/([a-zA-Z0-9_-]+)/');
-    final match = regex.firstMatch(sharedLink);
-
-    if (match != null && match.groupCount > 0) {
-      final fileId = match.group(1);
-      return 'https://drive.google.com/uc?export=view&id=$fileId';
+  Widget _buildImage(String imageUrl) {
+    try {
+      final convertedUrl = convertGoogleDriveLink(imageUrl);
+      return Image.network(
+        convertedUrl,
+        width: 100,
+        height: 100,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return const Text(
+            'Error al cargar la imagen',
+            style: TextStyle(color: Colors.red),
+          );
+        },
+      );
+    } catch (e) {
+      return const Text(
+        'URL inválida',
+        style: TextStyle(color: Colors.red),
+      );
     }
-
-    throw Exception('Enlace de Google Drive no válido');
   }
 }

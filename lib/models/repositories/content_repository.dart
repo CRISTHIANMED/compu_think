@@ -8,7 +8,8 @@ class ContentRepository {
   // Obtener contenido por tema
   Future<List<ContentEntity>> fetchSubtopicByTemaId(int idTema) async {
     try {
-      final response = await supabase.from('contenido')
+      final response = await supabase
+            .from('contenido')
             .select()
             .eq('id_tema', idTema);
 
@@ -45,7 +46,7 @@ class ContentRepository {
   Future<List<ViewDetailContentEntity>> fetchContenidoDetalleByTemaId(int idTema) async {
     try {
       final response = await supabase
-          .from('contenido_detalle') // Nombre de la vista
+          .from('view_contenido_detalle') // Nombre de la vista
           .select()
           .eq('tema_id', idTema)
           .order('contenido_id', ascending: true);

@@ -19,6 +19,7 @@ class SubtopicsPageState extends State<SubtopicsPage> {
   String? _errorMessage;
 
   late int idUnidad;
+  late int idPersona;
   late String nombre;
   late String descripcion;
   late String titulo;
@@ -35,11 +36,13 @@ class SubtopicsPageState extends State<SubtopicsPage> {
     final args =
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     if (args != null) {
+      idPersona = args['id_persona'] as int;
       idUnidad = args['id_unidad'] as int;
       nombre = args['nombre'] as String;
       descripcion = args['descripcion'] as String;
-      titulo = args['titulo'] as String;
+      titulo = args['tituloUnidad'];
     } else {
+      idPersona = 0;
       idUnidad = 0;
       nombre = 'Nombre no disponible';
       descripcion = 'Descripción no disponible';
@@ -138,7 +141,7 @@ class SubtopicsPageState extends State<SubtopicsPage> {
             ),
           ),
           onPressed: () {
-            _navigateToRetosScreen(context);
+            _navigateToRetosScreen(context, idPersona, idUnidad);
           },
           child: const Padding(
             padding: EdgeInsets.all(12.0),
@@ -187,12 +190,15 @@ class SubtopicsPageState extends State<SubtopicsPage> {
     );
   }
 
-  void _navigateToRetosScreen(BuildContext context) {
-    Navigator.push(
+  void _navigateToRetosScreen(BuildContext context, idPersona, idUnidad) {
+    Navigator.pushNamed(
       context,
-      MaterialPageRoute(
-        builder: (context) => const ChallengePage(),
-      ),
+      '/retos',
+      arguments: {
+        'idPersona': idPersona,
+        'idUnidad': idUnidad,
+        'tituloUnidad': titulo
+      }
     );
   }
 }

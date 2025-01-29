@@ -7,8 +7,10 @@ import 'package:http/http.dart' as http;
 
 class PdfViewerPage extends StatefulWidget {
   final String pdfUrl;
+  final String nombre;
+  final String tema;
 
-  const PdfViewerPage({super.key, required this.pdfUrl});
+  const PdfViewerPage({super.key, required this.pdfUrl, required this.nombre, required this.tema});
 
   @override
   PdfViewerPageState createState() => PdfViewerPageState();
@@ -54,7 +56,7 @@ class PdfViewerPageState extends State<PdfViewerPage> {
         if (!await downloadsDir.exists()) {
           await downloadsDir.create(recursive: true);
         }
-        const fileName = 'documento_descargado.pdf';
+        String fileName = 'Tema_${widget.tema}_${widget.nombre}.pdf';
         final newFile = File('${downloadsDir.path}/$fileName');
         await File(localPath!).copy(newFile.path);
         if (mounted) {

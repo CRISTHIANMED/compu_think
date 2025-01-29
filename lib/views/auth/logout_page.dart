@@ -34,7 +34,9 @@ class _LogoutPageState extends State<LogoutPage> {
 
     // Construir el nombre completo y asignar el correo
     setState(() {
-      userName = "$nombre1 $nombre2 $apellido1 $apellido2".replaceAll(RegExp(r'\s+'), ' ').trim();
+      userName = "$nombre1 $nombre2 $apellido1 $apellido2"
+          .replaceAll(RegExp(r'\s+'), ' ')
+          .trim();
       userEmail = email;
     });
   }
@@ -44,6 +46,12 @@ class _LogoutPageState extends State<LogoutPage> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context); // Regresar a la pantalla anterior
+          },
+        ),
       ),
       body: Center(
         child: Column(
@@ -89,7 +97,8 @@ class _LogoutPageState extends State<LogoutPage> {
                 _logout(context);
               },
               style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                 textStyle: const TextStyle(fontSize: 18),
               ),
               child: const Text("Cerrar sesión"),
@@ -107,6 +116,7 @@ class _LogoutPageState extends State<LogoutPage> {
   // Función para manejar la acción de cerrar sesión
   Future<void> _logout(BuildContext context) async {
     await _authController.clearCredentials();
-    Navigator.pushReplacementNamed(context, '/'); // Vuelve a la pantalla de inicio
+    Navigator.pushReplacementNamed(
+        context, '/'); // Vuelve a la pantalla de inicio
   }
 }

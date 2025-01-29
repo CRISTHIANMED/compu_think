@@ -51,6 +51,20 @@ class UserUnitRepository {
     }
   }
 
+/// Actualiza el campo `id_tipo_estado` basado en los valores de `idunidad` y `idpersona`
+Future<void> updateUserUnitState(int idUnidad, int idPersona, int idTipoEstado) async {
+  try {
+    await supabase
+        .from('persona_unidad')
+        .update({'id_tipo_estado': idTipoEstado}) // Campo a actualizar
+        .eq('idunidad', idUnidad) // Filtro por 'idunidad'
+        .eq('idpersona', idPersona); // Filtro por 'idpersona'
+
+  } catch (e) {
+    throw Exception('Error al actualizar id_tipo_estado: $e');
+  }
+}
+
 
   /// Actualiza un registro existente en 'persona_unidad'
   /*Future<void> updateUserUnit(UserUnitEntity userUnit) async {
