@@ -3,7 +3,6 @@
 import 'package:compu_think/controllers/auth_controller.dart';
 import 'package:compu_think/controllers/challenge_controller.dart';
 import 'package:compu_think/controllers/unit_controller.dart';
-import 'package:compu_think/models/repositories/challenge_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

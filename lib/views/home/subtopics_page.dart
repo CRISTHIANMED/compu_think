@@ -1,7 +1,6 @@
 import 'package:compu_think/controllers/subtopic_controller.dart';
 import 'package:compu_think/models/entities/subtopic_entity.dart';
 import 'package:compu_think/utils/widgets/custom_bottom_navigation_bar.dart';
-import 'package:compu_think/views/home/challenges_page.dart';
 import 'package:flutter/material.dart';
 
 class SubtopicsPage extends StatefulWidget {

@@ -1,5 +1,4 @@
 
-import 'package:compu_think/models/entities/user_challenge_entity.dart';
 import 'package:compu_think/models/entities/view_detail_challenge_entity.dart';
 import 'package:compu_think/models/repositories/challenge_repository.dart';
 import 'package:compu_think/models/repositories/user_challenge_repository.dart';
