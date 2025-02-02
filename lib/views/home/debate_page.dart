@@ -1,16 +1,7 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 
-class DebateApp extends StatelessWidget {
-  const DebateApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: DebatePage(),
-    );
-  }
-}
 
 class DebatePage extends StatefulWidget {
   const DebatePage({super.key});

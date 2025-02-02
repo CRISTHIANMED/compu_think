@@ -1,8 +1,7 @@
-// ignore_for_file: library_private_types_in_public_api
-
 import 'package:compu_think/controllers/challenge_controller.dart';
+import 'package:compu_think/mainTest3.dart';
 import 'package:compu_think/models/entities/view_detail_challenge_entity.dart';
-import 'package:compu_think/views/home/question_page.dart';
+import 'package:compu_think/views/home/questions_page.dart';
 import 'package:flutter/material.dart';
 import 'package:compu_think/utils/widgets/custom_bottom_navigation_bar.dart';
 
@@ -149,15 +148,26 @@ class _ChallengePageState extends State<ChallengePage> {
             ),
           ),
           onPressed: isEnabled
-              ? () {
+              ? () async {
                   if (reto.idTipoReto == 1) {
-                    Navigator.push(
+                    final result = await Navigator.push(
                       context,
                       MaterialPageRoute(
                           builder: (context) => QuestionPage(idUnidad)),
                     );
+
+                    // Si result es true, recargar los datos
+                    if (result == true) {
+                      _fetchRetos(); // Llama nuevamente la función que carga los datos
+                      setState(() {}); // Asegura que la UI se actualice
+                    }
+
                   } else if (reto.idTipoReto == 2) {
-                    return;
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const DebatePage()),
+                    );
                   } else if (reto.idTipoReto == 3) {
                     return;
                   }

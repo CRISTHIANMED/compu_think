@@ -189,7 +189,7 @@ class _QuestionPageState extends State<QuestionPage> {
             TextButton(
               onPressed: () {
                 Navigator.of(dialogContext).pop(); // Cierra el diálogo
-                Navigator.pop(context); // Regresa a la pantalla anterior
+                Navigator.pop(context, true); // Regresa a la pantalla anterior
               },
               child: const Text("Salir"),
             ),

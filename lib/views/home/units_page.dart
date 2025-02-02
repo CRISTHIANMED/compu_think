@@ -130,6 +130,7 @@ class UnitsPageState extends State<UnitsPage> {
                                 Opacity(
                                     opacity: isEnabled ? 1.0 : 0.5,
                                     child: Text(
+                                      textAlign: TextAlign.justify, // Justifica el texto
                                       unidad
                                           .unidadDescripcion, // Muestra "Sin descripción" si es nula
                                       style: const TextStyle(
@@ -190,8 +191,8 @@ class UnitsPageState extends State<UnitsPage> {
       final convertedUrl = convertGoogleDriveLink(imageUrl);
       return Image.network(
         convertedUrl,
-        width: 100,
-        height: 100,
+        width: 110,
+        height: 110,
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) {
           return const Text(
