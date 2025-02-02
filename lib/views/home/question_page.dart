@@ -1,6 +1,8 @@
 // ignore_for_file: library_private_types_in_public_api
 
+import 'package:compu_think/controllers/challenge_controller.dart';
 import 'package:compu_think/controllers/questions_controller.dart';
+import 'package:compu_think/controllers/reponse_controller.dart';
 import 'package:compu_think/models/entities/question_options_entity.dart';
 import 'package:compu_think/utils/helper/convert_google_drive_link.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +21,10 @@ class _QuestionPageState extends State<QuestionPage> {
   List<Question> _questions = [];
   bool _isLoading = true;
   String? _errorMessage;
+  late int _idPersona;
 
+  final ChallengeController _challengeController = ChallengeController();
+  final ReponseController _reponseController = ReponseController();
   final QuestionController _questionController = QuestionController();
   late ScrollController _scrollController = ScrollController();
 
@@ -39,14 +44,21 @@ class _QuestionPageState extends State<QuestionPage> {
 
       final questions =
           await _questionController.fetchQuestions(idTipoReto, idUnidad);
+
+      final responses = await _reponseController
+          .fetchViewResponceByIdPersonIdUnidad(idPersona, idUnidad);
+
+      _saveAnswerDataBase(responses, idPersona, idUnidad);
+
       if (mounted) {
         setState(() {
           _questions = questions;
           _isLoading = false;
           _errorMessage = null;
+          _idPersona = idPersona;
+
           for (var question in _questions) {
-            selectedAnswers[question.id] =
-                prefs.getInt('answer_${question.id}');
+            selectedAnswers[question.id] = prefs.getInt('${question.id}');
           }
         });
       }
@@ -60,9 +72,23 @@ class _QuestionPageState extends State<QuestionPage> {
     }
   }
 
+  Future<void> _saveAnswerDataBase(
+      List<Map<String, dynamic>> responses, int idPersona, int idUnidad) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (responses.isNotEmpty) {
+      for (var response in responses) {
+        prefs.setInt('${response['id_reto_pregunta']}',
+            response['id_reto_pregunta_opcion']);
+        selectedAnswers[response['id_reto_pregunta']] =
+            prefs.getInt('${response['id_reto_pregunta']}');
+      }
+    }
+    return;
+  }
+
   Future<void> _saveAnswer(int questionId, int optionId) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setInt('answer_$questionId', optionId);
+    prefs.setInt('$questionId', optionId);
   }
 
   double calculatePercentage() {
@@ -125,9 +151,17 @@ class _QuestionPageState extends State<QuestionPage> {
             ),
             ElevatedButton(
               onPressed: () {
+                selectedAnswers.forEach((idRetoPregunta, idRetoPreguntaOpcion) {
+                  _reponseController.saveResponse(
+                      idPersona: _idPersona,
+                      idRetoPregunta: idRetoPregunta,
+                      idRetoPreguntaOpcion: idRetoPreguntaOpcion!);
+                });
+
+                _challengeController.updateCalificacion(_idPersona, widget.idUnidad, 1, percentage);
+
                 Navigator.pop(context); // Cierra el cuadro de diálogo
-                Navigator.pop(
-                    context); // Regresa a la pantalla anterior (retos)
+                Navigator.pop(context,true); // Regresa a la pantalla anterior (retos)
               },
               child: const Text("Continuar"),
             ),
@@ -308,9 +342,7 @@ class _QuestionPageState extends State<QuestionPage> {
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(8.0),
         child: ElevatedButton(
-          onPressed: () {
-            showResult;
-          },
+          onPressed: showResult,
           style: ElevatedButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 15),
             shape: RoundedRectangleBorder(
@@ -333,4 +365,6 @@ class _QuestionPageState extends State<QuestionPage> {
     _scrollController.dispose();
     super.dispose();
   }
+
+  
 }

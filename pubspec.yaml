@@ -50,6 +50,7 @@ dependencies:
   audioplayers: ^6.1.0
   audio_session: ^0.1.23
   rxdart: ^0.28.0
+  intl: ^0.19.0
 
 dev_dependencies:
   flutter_test:

@@ -1,3 +1,4 @@
+
 import 'package:compu_think/models/entities/user_challenge_entity.dart';
 import 'package:compu_think/models/entities/view_detail_challenge_entity.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -53,22 +54,23 @@ class UserChallengeRepository {
     await supabase.from('reto_persona').insert(list);
   }
 
-  /// Actualiza el campo 'id_tipo_estado' basado en los valores de 'id_reto' y 'id_persona'
-  Future<void> updateTipoEstado(
-      int idReto, int idPersona, int idTipoEstado) async {
-    await supabase
-        .from('reto_persona')
-        .update({'id_tipo_estado': idTipoEstado}) // Campo a actualizar
-        .eq('id_reto', idReto) // Condición para 'id_reto'
-        .eq('id_persona', idPersona); // Condición para 'id_persona'
-  }
+  /// Actualiza el campo 'Calificacion' basado en los valores de 'id_persona', 'id_unidad' y 'id_tipo reto'
+  Future<void> updateCalificacion(
+      int idPersona, int idUnidad, int idTipoReto, double calificacion) async {
+   
+      final response = await supabase
+          .from('view_detail_reto_persona')
+          .select('id_reto_persona')
+          .eq('id_persona', idUnidad)
+          .eq('id_unidad', idUnidad)
+          .eq('id_tipo_reto', idUnidad)
+          .single();
 
-  Future<List<ViewDetailChallengeEntity>> fetchDetailChallengeAll() async {
-    final response = await supabase.from('vista_reto_persona').select();
+      int idRetoPersona = response['id_reto_persona'];
 
-    return response
-        .map((data) => ViewDetailChallengeEntity.fromMap(data))
-        .toList();
+      await supabase
+          .from('reto_persona')
+          .update({'calificacion': calificacion}).eq('id', idRetoPersona);
   }
 
   Future<List<ViewDetailChallengeEntity>> fetchByIdPersonaAndIdUnidad(
@@ -77,7 +79,8 @@ class UserChallengeRepository {
         .from('view_detail_reto_persona')
         .select()
         .eq('id_persona', idPersona)
-        .eq('id_unidad', idUnidad);
+        .eq('id_unidad', idUnidad)
+        .order('id_tipo_reto', ascending: true);
 
     return response
         .map((data) => ViewDetailChallengeEntity.fromMap(data))

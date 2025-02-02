@@ -13,6 +13,4 @@ class QuestionController {
       throw Exception('Error al cargar los preguntas: $e');
     }
   }
-
-
 }

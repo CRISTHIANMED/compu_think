@@ -10,6 +10,8 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -19,6 +21,8 @@ class MyApp extends StatelessWidget {
 }
 
 class PreguntasPage extends StatefulWidget {
+  const PreguntasPage({super.key});
+
   @override
   _PreguntasPageState createState() => _PreguntasPageState();
 }
@@ -58,13 +62,13 @@ class _PreguntasPageState extends State<PreguntasPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Preguntas del Reto'),
+        title: const Text('Preguntas del Reto'),
       ),
       body: FutureBuilder<List<Map<String, dynamic>>>(
         future: _preguntas,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
 
           if (snapshot.hasError) {
@@ -72,7 +76,7 @@ class _PreguntasPageState extends State<PreguntasPage> {
           }
 
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No se encontraron preguntas'));
+            return const Center(child: Text('No se encontraron preguntas'));
           }
 
           // Mostrar los resultados

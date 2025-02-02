@@ -2,7 +2,6 @@
 
 import 'package:compu_think/services/supabase_service.dart';
 import 'package:compu_think/utils/helper/convert_google_drive_link.dart';
-import 'package:compu_think/utils/widgets/custom_bottom_navigation_bar.dart';
 import 'package:compu_think/views/home/challenges_page.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -105,6 +104,8 @@ List<Question> questions = [
 ];
 
 class QuestionPage2 extends StatefulWidget {
+  const QuestionPage2({super.key});
+
 
   @override
   _QuestionPage2State createState() => _QuestionPage2State();
@@ -159,7 +160,7 @@ class _QuestionPage2State extends State<QuestionPage2> {
   void showResult() {
     if (!areAllQuestionsAnswered()) {
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Por favor responde todas las preguntas.")));
+          const SnackBar(content: Text("Por favor responde todas las preguntas.")));
       return;
     }
 
@@ -184,7 +185,7 @@ class _QuestionPage2State extends State<QuestionPage2> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text("Porcentaje de aciertos: ${percentage.toStringAsFixed(2)}%"),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Text("$correctAnswers/${questions.length} preguntas acertadas."),
             ],
           ),
@@ -193,7 +194,7 @@ class _QuestionPage2State extends State<QuestionPage2> {
               onPressed: () {
                 Navigator.pop(context); // Cierra el cuadro de diálogo
               },
-              child: Text("Intentar de nuevo"),
+              child: const Text("Intentar de nuevo"),
             ),
             ElevatedButton(
               onPressed: () {
@@ -206,7 +207,7 @@ class _QuestionPage2State extends State<QuestionPage2> {
                 //Navigator.pop(context); // Cierra el cuadro de diálogo
                 //Navigator.pop(context); // Regresa a la pantalla anterior (retos)
               },
-              child: Text("Continuar"),
+              child: const Text("Continuar"),
             ),
           ],
         );
@@ -219,22 +220,22 @@ class _QuestionPage2State extends State<QuestionPage2> {
       context: context,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
-          title: Text("¿Salir sin enviar?"),
-          content: Text(
+          title: const Text("¿Salir sin enviar?"),
+          content: const Text(
               "Si sales ahora, tus respuestas no se guardarán. ¿Estás seguro?"),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(dialogContext).pop(); // Cierra el diálogo
               },
-              child: Text("Cancelar"),
+              child: const Text("Cancelar"),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(dialogContext).pop(); // Cierra el diálogo
                 Navigator.pop(context); // Regresa a la pantalla anterior
               },
-              child: Text("Salir"),
+              child: const Text("Salir"),
             ),
           ],
         );
@@ -248,9 +249,9 @@ class _QuestionPage2State extends State<QuestionPage2> {
       future: precacheImage(NetworkImage(imageUrl), context),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
-          return Icon(Icons.error, size: 50, color: Colors.red);
+          return const Icon(Icons.error, size: 50, color: Colors.red);
         } else {
           return Image.network(imageUrl);
         }
@@ -262,7 +263,7 @@ class _QuestionPage2State extends State<QuestionPage2> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Preguntas del reto"),
+        title: const Text("Preguntas del reto"),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -277,7 +278,7 @@ class _QuestionPage2State extends State<QuestionPage2> {
           final question = questions[index];
           return Card(
             color: const Color.fromARGB(255, 189, 219, 243),
-            margin: EdgeInsets.all(25),
+            margin: const EdgeInsets.all(25),
             child: Padding(
               padding: const EdgeInsets.all(10.0),
               child: Column(
@@ -286,9 +287,9 @@ class _QuestionPage2State extends State<QuestionPage2> {
                   Text(
                     question.title,
                     textAlign: TextAlign.justify,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
                     question.questionText,
                     textAlign: TextAlign.justify,
@@ -296,11 +297,11 @@ class _QuestionPage2State extends State<QuestionPage2> {
                         true, // Permite que el texto se divida en varias líneas
                   ),
                   if (question.imageUrl != null) ...[
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     //Image.network(question.imageUrl!),
                     _buildImage(question.imageUrl!),
                   ],
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   ...question.options.map(
                     (option) {
                       return Column(
@@ -337,7 +338,7 @@ class _QuestionPage2State extends State<QuestionPage2> {
                             ],
                           ),
                           if (option.imageUrl != null) ...[
-                            SizedBox(height: 8),
+                            const SizedBox(height: 8),
                             //Image.network(option.imageUrl!, width: 100, height: 100),
                             _buildImage(option.imageUrl!),
                           ],
@@ -356,7 +357,7 @@ class _QuestionPage2State extends State<QuestionPage2> {
         child: ElevatedButton(
           onPressed: showResult,
           style: ElevatedButton.styleFrom(
-            padding: EdgeInsets.symmetric(vertical: 15),
+            padding: const EdgeInsets.symmetric(vertical: 15),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),

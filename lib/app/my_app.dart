@@ -3,7 +3,6 @@ import 'package:compu_think/views/auth/login_page.dart';
 import 'package:compu_think/views/auth/logout_page.dart';
 import 'package:compu_think/views/home/challenges_page.dart';
 import 'package:compu_think/views/home/contents_page.dart';
-import 'package:compu_think/views/home/question_page.dart';
 import 'package:compu_think/views/home/subtopics_page.dart';
 import 'package:compu_think/views/home/units_page.dart';
 import 'package:flutter/material.dart';
