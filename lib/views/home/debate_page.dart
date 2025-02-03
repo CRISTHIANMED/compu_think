@@ -1,7 +1,7 @@
 // ignore_for_file: library_private_types_in_public_api
 
+import 'package:compu_think/utils/widgets/custom_bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
-
 
 class DebatePage extends StatefulWidget {
   const DebatePage({super.key});
@@ -16,7 +16,8 @@ class _DebatePageState extends State<DebatePage> {
 
   void addComment(String text) {
     setState(() {
-      comments.insert(0, Comment(user: "Usuario", text: text, timestamp: DateTime.now()));
+      comments.insert(
+          0, Comment(user: "Usuario", text: text, timestamp: DateTime.now()));
       _controller.clear();
     });
   }
@@ -29,6 +30,7 @@ class _DebatePageState extends State<DebatePage> {
 
   String timeAgo(DateTime timestamp) {
     final Duration difference = DateTime.now().difference(timestamp);
+
     if (difference.inDays > 0) {
       return 'Hace ${difference.inDays} días';
     } else if (difference.inHours > 0) {
@@ -44,12 +46,7 @@ class _DebatePageState extends State<DebatePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Debate")),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Inicio"),
-          BottomNavigationBarItem(icon: Icon(Icons.comment), label: "Debate"),
-        ],
-      ),
+      bottomNavigationBar: const CustomBottomNavigationBar(currentIndex: 0),
       body: Column(
         children: [
           Expanded(
@@ -57,15 +54,24 @@ class _DebatePageState extends State<DebatePage> {
               itemCount: comments.length,
               itemBuilder: (context, index) {
                 return Card(
-                  margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                  margin:
+                      const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                   child: ListTile(
-                    title: Text(comments[index].user, style: const TextStyle(fontWeight: FontWeight.bold)),
+                    title: Text(
+                      comments[index].user,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(comments[index].text),
+                        Text(
+                          comments[index].text,
+                          textAlign: TextAlign.justify,
+                        ),
                         const SizedBox(height: 5),
-                        Text(timeAgo(comments[index].timestamp), style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                        Text(timeAgo(comments[index].timestamp),
+                            style: const TextStyle(
+                                color: Colors.grey, fontSize: 12)),
                       ],
                     ),
                     trailing: PopupMenuButton<String>(
@@ -75,7 +81,8 @@ class _DebatePageState extends State<DebatePage> {
                         }
                       },
                       itemBuilder: (context) => [
-                        const PopupMenuItem(value: 'Eliminar', child: Text('Eliminar')),
+                        const PopupMenuItem(
+                            value: 'Eliminar', child: Text('Eliminar')),
                       ],
                     ),
                   ),
