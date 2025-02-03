@@ -13,13 +13,16 @@ class UnitRepository {
       final response = await supabase
           .from('unidad')
           .select()
-          .order('orden', ascending: true);
+          .order('orden', ascending: true); 
 
       if (response.isEmpty) {
         return [];
       }
 
-      return response.map((map) => UnitEntity.fromMap(map)).toList();
+      return response
+        .map((map) => UnitEntity.fromMap(map))
+        .toList();
+
     } catch (e) {
       // Manejo de errores, si algo falla en la consulta o en el mapeo
       throw Exception(e);
@@ -33,14 +36,17 @@ class UnitRepository {
       final response = await supabase
           .from('unidad')
           .select('id')
-          .order('orden', ascending: true);
+          .order('orden', ascending: true); 
 
       if (response.isEmpty) {
         return [];
       }
 
       // Mapea los resultados y devuelve solo los IDs como una lista de enteros
-      return (response as List).map((map) => map['id'] as int).toList();
+      return (response as List)
+          .map((map) => map['id'] as int)
+          .toList();
+
     } catch (e) {
       // Manejo de errores
       throw Exception('Error al obtener los IDs de las unidades: $e');
@@ -50,23 +56,27 @@ class UnitRepository {
   /// Obtiene una unidad específica por su ID
   Future<UnitEntity?> fetchUnitById(int id) async {
     try {
-      final response =
-          await supabase.from('unidad').select().eq('id', id).single();
+      final response = await supabase
+        .from('unidad')
+        .select()
+        .eq('id', id)
+        .single();
 
       return UnitEntity.fromMap(response);
+      
     } catch (e) {
       throw Exception('Error al obtener la unidad con id $id: $e');
     }
   }
 
-  Future<List<ViewDetailUnitEntity>> fetchUnitsViewByPersonId(
-      int personId) async {
+  Future<List<ViewDetailUnitEntity>> fetchUnitsViewByPersonId(int personId) async {
+  try {
     // Realiza la consulta a Supabase
     final response = await Supabase.instance.client
         .from('vista_detalles_unidad') // Nombre de tu vista
         .select()
         .eq('id_persona', personId)
-        .order('unidad_orden', ascending: true);
+        .order('unidad_orden', ascending: true); 
 
     // Convertir los datos obtenidos a objetos ViewDetailUnitEntity
     List<ViewDetailUnitEntity> units = [];
@@ -79,15 +89,15 @@ class UnitRepository {
       switch (unit.tipoEstadoDescripcion.toLowerCase()) {
         case 'pendiente':
           unit.isEnabled = true;
-          unit.colorFondo = const Color.fromARGB(255, 235, 239, 115);
+          unit.colorFondo = const Color.fromARGB(255, 235, 239, 115) ;
           break;
         case 'no_completado':
           unit.isEnabled = false;
-          unit.colorFondo = const Color.fromARGB(255, 173, 171, 171);
+          unit.colorFondo = const Color.fromARGB(255, 173, 171, 171) ;
           break;
         case 'completado':
           unit.isEnabled = true;
-          unit.colorFondo = const Color.fromARGB(255, 71, 177, 74);
+          unit.colorFondo = const Color.fromARGB(255, 71, 177, 74) ;
           break;
         default:
           unit.isEnabled = false;
@@ -96,5 +106,10 @@ class UnitRepository {
     }
 
     return units;
+  } catch (e) {
+    // Manejo del error
+    throw Exception('Ocurrió un error al obtener las unidades: $e');
   }
+}
+
 }
