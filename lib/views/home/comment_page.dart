@@ -1,6 +1,16 @@
-import 'package:compu_think/utils/widgets/custom_bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 
+class DebateApp extends StatelessWidget {
+  const DebateApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: DebatePage(),
+    );
+  }
+}
 
 class DebatePage extends StatefulWidget {
   const DebatePage({super.key});
