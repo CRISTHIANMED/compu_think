@@ -32,8 +32,8 @@ class UnitController {
     }
   }
 
-  Future<void> initializeUserUnits(int idPersona, List<int> idUnidades,
-      List<Map<String, dynamic>> idsRetos) async {
+  Future<void> initializeUserUnits(
+      int idPersona, List<int> idUnidades, List<Map<String, dynamic>> idsRetos) async {
     try {
       // Verificar si la tabla 'persona_unidad' ya tiene registros para este usuario
       final existingRecordsUserUnit =
@@ -75,67 +75,42 @@ class UnitController {
     }
   }
 
-  Future<void> insertarRegistrosUnidadPersona(
-      int idPersona, List<int> idUnidades) async {
-    try {
-      // Verificar que la lista no esté vacía
-      if (idUnidades.isEmpty) {
-        print("Error: La lista de unidades está vacía.");
-        return;
-      }
-
-      // Crear lista de registros para insertar
-      final List<Map<String, dynamic>> registros = [];
-
-      for (int i = 0; i < idUnidades.length; i++) {
-        registros.add({
-          'id_persona': idPersona,
-          'id_unidad': idUnidades[i],
-          'id_tipo_estado': i == 0
-              ? 2
-              : 3, // Primera unidad en progreso, las demás pendientes
-          'fecha_inicio': i == 0
-              ? DateTime.now()
-                  .toUtc()
-                  .toIso8601String() // Solo para la primera unidad
-              : null,
-        });
-      }
-
-      // Intentar insertar los registros en la base de datos
-      await _userUnitRepository.insertUserUnit(registros);
-      print("Registros insertados correctamente.");
-    } catch (e) {
-      throw Exception("Error al insertar registros en la base de datos: $e");
+  Future<void> insertarRegistrosUnidadPersona(idPersona, idUnidades) async {
+    // Crear lista de registros para insertar
+    final List<Map<String, dynamic>> registros = [];
+    for (int i = 0; i < idUnidades.length; i++) {
+      registros.add({
+        'id_persona': idPersona,
+        'id_unidad': idUnidades[i],
+        'id_tipo_estado': i == 0
+            ? 2
+            : 3, // Primera unidad pendiente, las demás no completadas
+        'fecha_inicio': i == 0
+            ? DateTime.now()
+                .toUtc()
+                .toIso8601String() // Solo para la primera unidad
+            : null, // O asigna otro valor si es necesario para las demás unidades
+      });
     }
+    await _userUnitRepository.insertUserUnit(registros);
   }
 
   Future<void> insertarRegistrosRetoPersona(
-      int idPersona, List<Map<String, dynamic>> idsRetos) async {
-    try {
-      final List<Map<String, dynamic>> registros = [];
+      idPersona, List<Map<String, dynamic>> idsRetos) async {
 
-      for (var reto in idsRetos) {
-        if (reto.containsKey('id') && reto.containsKey('id_tipo_reto')) {
-          registros.add({
-            'id_persona': idPersona,
-            'id_reto': reto['id'],
-            'id_tipo_estado': (reto['id_tipo_reto'] == 1) ? 2 : 3,
-          });
-        } else {
-          print("Error: Datos de reto incompletos: $reto");
-        }
-      }
+    final List<Map<String, dynamic>> registros = [];
 
-      if (registros.isNotEmpty) {
-        await _userChallengeRepository.insert(registros);
-        print("Registros insertados correctamente.");
-      } else {
-        print("No hay registros válidos para insertar.");
-      }
-    } catch (e) {
-      throw Exception("Error al insertar registros en la base de datos: $e");
+    for (var reto in idsRetos) {
+      registros.add({
+        'id_persona': idPersona,
+        'id_reto': reto['id'], 
+        'id_tipo_estado': (reto['id_tipo_reto'] == 1)
+            ? 2
+            : 3, // Completado si id_tipo_reto es 1, sino Pendiente
+      });
     }
+
+    await _userChallengeRepository.insert(registros);
   }
 
   Future<List<ViewDetailUnitEntity>> fetchUnitsViewByPersonId(

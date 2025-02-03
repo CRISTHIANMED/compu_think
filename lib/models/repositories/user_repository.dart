@@ -8,22 +8,28 @@ class UserRepository {
 
   Future<UserEntity?> fetchUserByEmailOrUsername(
       String input, String contrasena) async {
-    // Realiza la consulta en la tabla 'persona'
-    final response = await supabase
-        .from('persona')
-        .select()
-        .or('name_user.eq.$input, email.eq.$input');
+    try {
+      // Realiza la consulta en la tabla 'persona'
+      final response = await supabase
+          .from('persona')
+          .select()
+          .or('name_user.eq.$input, email.eq.$input');
 
-    // Verifica si no se encuentra el usuario
-    if (response.isEmpty) {
-      throw Exception('Usuario no encontrado');
+      // Verifica si no se encuentra el usuario
+      if (response.isEmpty) {
+        throw Exception('Usuario no encontrado');
+      }
+      
+      // Si la respuesta no está vacía, obtiene el primer usuario
+      if (response.isNotEmpty) {
+        final UserEntity persona = UserEntity.fromMap(response[0]);
+        return persona;
+      }
+      return null;
+      
+    } catch (e) {
+      // Manejo de errores, si algo falla en la consulta o el proceso
+      throw Exception(e);
     }
-
-    // Si la respuesta no está vacía, obtiene el primer usuario
-    if (response.isNotEmpty) {
-      final UserEntity persona = UserEntity.fromMap(response[0]);
-      return persona;
-    }
-    return null;
   }
 }
