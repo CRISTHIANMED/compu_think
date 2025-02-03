@@ -2,7 +2,7 @@
 
 import 'package:compu_think/controllers/challenge_controller.dart';
 import 'package:compu_think/models/entities/view_detail_challenge_entity.dart';
-import 'package:compu_think/views/home/questions_page.dart';
+import 'package:compu_think/views/home/question_page.dart';
 import 'package:flutter/material.dart';
 import 'package:compu_think/utils/widgets/custom_bottom_navigation_bar.dart';
 

@@ -6,7 +6,6 @@ class QuestionOptionsRepository {
 
   Future<List<Question>> getPreguntasByTipoUnidad(
       int idTipoReto, int idUnidad) async {
-    try {
       final response = await supabase
           .from('reto_pregunta')
           .select('id, titulo, pregunta, url_imagen,'
