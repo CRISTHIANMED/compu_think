@@ -1,10 +1,12 @@
-// ignore_for_file: library_private_types_in_public_api
 import 'package:compu_think/utils/widgets/custom_bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
-
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class DebatePage extends StatefulWidget {
-  const DebatePage({super.key});
+  final int idReto;
+  final int idPersona;
+
+  const DebatePage({super.key, required this.idReto, required this.idPersona});
 
   @override
   _DebatePageState createState() => _DebatePageState();
@@ -12,16 +14,45 @@ class DebatePage extends StatefulWidget {
 
 class _DebatePageState extends State<DebatePage> {
   final TextEditingController _controller = TextEditingController();
+  final SupabaseClient supabase = Supabase.instance.client;
   List<Comment> comments = [];
 
-  void addComment(String text) {
+  @override
+  void initState() {
+    super.initState();
+    fetchComments();
+  }
+
+  Future<void> fetchComments() async {
+    final response = await supabase
+        .from('reto_comentario')
+        .select()
+        .eq('id_reto', widget.idReto)
+        .order('fecha', ascending: false);
+
     setState(() {
-      comments.insert(0, Comment(user: "Usuario", text: text, timestamp: DateTime.now()));
+      comments = response.map((data) => Comment.fromMap(data)).toList();
+    });
+  }
+
+  Future<void> addComment(String text) async {
+    final newComment = {
+      'id_persona': widget.idPersona,
+      'id_reto': widget.idReto,
+      'texto': text,
+      'fecha': DateTime.now().toUtc().toIso8601String(),
+    };
+
+    final response = await supabase.from('reto_comentario').insert(newComment).select().single();
+
+    setState(() {
+      comments.insert(0, Comment.fromMap(response));
       _controller.clear();
     });
   }
 
-  void deleteComment(int index) {
+  Future<void> deleteComment(int id, int index) async {
+    await supabase.from('reto_comentario').delete().eq('id', id);
     setState(() {
       comments.removeAt(index);
     });
@@ -68,7 +99,7 @@ class _DebatePageState extends State<DebatePage> {
                     trailing: PopupMenuButton<String>(
                       onSelected: (value) {
                         if (value == 'Eliminar') {
-                          deleteComment(index);
+                          deleteComment(comments[index].id, index);
                         }
                       },
                       itemBuilder: (context) => [
@@ -112,9 +143,19 @@ class _DebatePageState extends State<DebatePage> {
 }
 
 class Comment {
+  int id;
   String user;
   String text;
   DateTime timestamp;
 
-  Comment({required this.user, required this.text, required this.timestamp});
+  Comment({required this.id, required this.user, required this.text, required this.timestamp});
+
+  factory Comment.fromMap(Map<String, dynamic> map) {
+    return Comment(
+      id: map['id'],
+      user: 'Usuario ${map['id_persona']}',
+      text: map['texto'],
+      timestamp: DateTime.parse(map['fecha']).toLocal(),
+    );
+  }
 }

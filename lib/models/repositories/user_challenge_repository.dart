@@ -63,7 +63,7 @@ class UserChallengeRepository {
           .select('id_reto_persona')
           .eq('id_persona', idPersona)
           .eq('id_unidad', idUnidad)
-          .eq('id_tipo_reto', idUnidad)
+          .eq('id_tipo_reto', idTipoReto)
           .single();
 
       int idRetoPersona = response['id_reto_persona'];

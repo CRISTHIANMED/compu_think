@@ -24,7 +24,7 @@ class ChallengeRepository {
       final response = await supabase
         .from('reto')
         .select()
-        .eq('id_tema', idUnidad);
+        .eq('id_unidad', idUnidad);
 
       final data = response as List<dynamic>;
       return data

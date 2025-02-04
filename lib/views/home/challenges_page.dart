@@ -6,6 +6,7 @@ import 'package:compu_think/views/home/debate_page.dart';
 import 'package:compu_think/views/home/question_page.dart';
 import 'package:flutter/material.dart';
 import 'package:compu_think/utils/widgets/custom_bottom_navigation_bar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ChallengePage extends StatefulWidget {
   const ChallengePage({super.key});
@@ -15,6 +16,9 @@ class ChallengePage extends StatefulWidget {
 }
 
 class _ChallengePageState extends State<ChallengePage> {
+
+  String userName = ""; // Nombre completo
+  String userEmail = ""; // Correo electrónico
   final ChallengeController _challengeController = ChallengeController();
 
   List<ViewDetailChallengeEntity> _retos = [];
@@ -45,6 +49,22 @@ class _ChallengePageState extends State<ChallengePage> {
       idPersona = 0;
       titulo = 'Título no disponible';
     }
+  }
+
+  // Método para cargar los datos del usuario desde SharedPreferences
+  Future<void> _loadUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final nombre1 = prefs.getString('nombre1') ?? '';
+    final nombre2 = prefs.getString('nombre2') ?? '';
+    final apellido1 = prefs.getString('apellido1') ?? '';
+    final apellido2 = prefs.getString('apellido2') ?? '';
+
+    // Construir el nombre completo y asignar el correo
+    setState(() {
+      userName = "$nombre1 $apellido1 "
+          .replaceAll(RegExp(r'\s+'), ' ')
+          .trim();
+    });
   }
 
   Future<void> _fetchRetos() async {
@@ -168,7 +188,7 @@ class _ChallengePageState extends State<ChallengePage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const DebatePage(),
+                        builder: (context) => DebatePage(idReto: reto.idReto, idPersona: idPersona),
                       )
                     );
                   } else if (reto.idTipoReto == 3) {

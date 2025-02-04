@@ -39,6 +39,7 @@ class AuthController {
           'apellido1': persona.apellido1 ?? '',
           'apellido2': persona.apellido2 ?? '',
           'rol': persona.rol,
+          'nUsuario': persona.nombreU ?? '',
         };
 
         for (var entry in dataToStore.entries) {

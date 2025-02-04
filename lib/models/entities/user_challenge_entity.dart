@@ -28,6 +28,8 @@ class UserChallengeEntity {
 
   // Método para convertir una entidad Unidad a un mapa (para la base de datos)
   Map<String, dynamic> toMap() {
+
+    
     return {
       'id': id,
       'id_reto': idReto,
