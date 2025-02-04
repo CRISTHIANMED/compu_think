@@ -150,7 +150,7 @@ class _QuestionPageState extends State<QuestionPage> {
               child: const Text("Intentar de nuevo"),
             ),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 selectedAnswers.forEach((idRetoPregunta, idRetoPreguntaOpcion) {
                   _reponseController.saveResponse(
                       idPersona: _idPersona,
@@ -158,7 +158,7 @@ class _QuestionPageState extends State<QuestionPage> {
                       idRetoPreguntaOpcion: idRetoPreguntaOpcion!);
                 });
 
-                _challengeController.updateCalificacion(_idPersona, widget.idUnidad, 1, percentage);
+                await _challengeController.updateCalificacion(_idPersona, widget.idUnidad, 1, percentage);
 
                 Navigator.pop(context); // Cierra el cuadro de diálogo
                 Navigator.pop(context,true); // Regresa a la pantalla anterior (retos)

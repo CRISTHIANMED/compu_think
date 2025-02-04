@@ -69,7 +69,7 @@ class _LoginPageState extends State<LoginPage> {
         final idsUnidades = await _unitController.fetchAllUnitIds();
         final idsRetos = await _challengeController.fetchAllChallengeIds();
 
-        _unitController.initializeUserUnits(idPersona, idsUnidades, idsRetos);
+        await _unitController.initializeUserUnits(idPersona, idsUnidades, idsRetos);
         Navigator.pushReplacementNamed(context, '/Unidad');
       } else {
         setState(() {

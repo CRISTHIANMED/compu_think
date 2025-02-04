@@ -31,7 +31,7 @@ class SubtopicsPageState extends State<SubtopicsPage> {
   }
 
   // Cargar los argumentos de la navegación
-  void _loadArguments() {
+  void _loadArguments()  {
     final args =
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     if (args != null) {

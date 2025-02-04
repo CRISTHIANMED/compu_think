@@ -1,5 +1,4 @@
 // ignore_for_file: library_private_types_in_public_api
-
 import 'package:compu_think/utils/widgets/custom_bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 
@@ -45,11 +44,8 @@ class _DebatePageState extends State<DebatePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Debate")),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Inicio"),
-          BottomNavigationBarItem(icon: Icon(Icons.comment), label: "Debate"),
-        ],
+      bottomNavigationBar: const CustomBottomNavigationBar(
+        currentIndex: 0,
       ),
       body: Column(
         children: [

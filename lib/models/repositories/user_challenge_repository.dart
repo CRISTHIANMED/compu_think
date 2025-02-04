@@ -61,7 +61,7 @@ class UserChallengeRepository {
       final response = await supabase
           .from('view_detail_reto_persona')
           .select('id_reto_persona')
-          .eq('id_persona', idUnidad)
+          .eq('id_persona', idPersona)
           .eq('id_unidad', idUnidad)
           .eq('id_tipo_reto', idUnidad)
           .single();

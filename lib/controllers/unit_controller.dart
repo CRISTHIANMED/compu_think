@@ -45,8 +45,8 @@ class UnitController {
       if (existingRecordsUserUnit.isEmpty && existingRecordsChallenge.isEmpty) {
         print(
             'Datos insertados correctamente para el usuario con id $idPersona.');
-        insertarRegistrosUnidadPersona(idPersona, idUnidades);
-        insertarRegistrosRetoPersona(idPersona, idsRetos);
+        await insertarRegistrosUnidadPersona(idPersona, idUnidades);
+        await insertarRegistrosRetoPersona(idPersona, idsRetos);
         return;
       }
 
@@ -54,7 +54,7 @@ class UnitController {
           existingRecordsChallenge.isNotEmpty) {
         print(
             'Datos insertados correctamente para el usuario con id $idPersona.');
-        insertarRegistrosUnidadPersona(idPersona, idUnidades);
+        await  insertarRegistrosUnidadPersona(idPersona, idUnidades);
         return;
       }
 
@@ -62,7 +62,7 @@ class UnitController {
           existingRecordsChallenge.isEmpty) {
         print(
             'Datos insertados correctamente para el usuario con id $idPersona.');
-        insertarRegistrosRetoPersona(idPersona, idsRetos);
+        await insertarRegistrosRetoPersona(idPersona, idsRetos);
         return;
       }
 

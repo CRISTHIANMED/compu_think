@@ -46,12 +46,16 @@ class _LogoutPageState extends State<LogoutPage> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-       /*leading: IconButton(
+        leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context); // Regresar a la pantalla anterior
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context); // Regresar si hay una pantalla anterior
+            } else {
+              Navigator.pushReplacementNamed(context, '/Unidad');
+            }
           },
-        ),*/
+        ),
       ),
       body: Center(
         child: Column(
