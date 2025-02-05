@@ -16,9 +16,6 @@ class ChallengePage extends StatefulWidget {
 }
 
 class _ChallengePageState extends State<ChallengePage> {
-
-  String userName = ""; // Nombre completo
-  String userEmail = ""; // Correo electrónico
   final ChallengeController _challengeController = ChallengeController();
 
   List<ViewDetailChallengeEntity> _retos = [];
@@ -37,7 +34,6 @@ class _ChallengePageState extends State<ChallengePage> {
   }
 
   void _loadArguments() {
-
     final args =
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     if (args != null) {
@@ -51,21 +47,7 @@ class _ChallengePageState extends State<ChallengePage> {
     }
   }
 
-  // Método para cargar los datos del usuario desde SharedPreferences
-  Future<void> _loadUserData() async {
-    final prefs = await SharedPreferences.getInstance();
-    final nombre1 = prefs.getString('nombre1') ?? '';
-    final nombre2 = prefs.getString('nombre2') ?? '';
-    final apellido1 = prefs.getString('apellido1') ?? '';
-    final apellido2 = prefs.getString('apellido2') ?? '';
-
-    // Construir el nombre completo y asignar el correo
-    setState(() {
-      userName = "$nombre1 $apellido1 "
-          .replaceAll(RegExp(r'\s+'), ' ')
-          .trim();
-    });
-  }
+  
 
   Future<void> _fetchRetos() async {
     try {
@@ -164,7 +146,7 @@ class _ChallengePageState extends State<ChallengePage> {
         opacity: opacity,
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(vertical: 20),
+            padding: const EdgeInsets.symmetric(vertical: 15),
             backgroundColor: cardColor,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -186,11 +168,11 @@ class _ChallengePageState extends State<ChallengePage> {
                     }
                   } else if (reto.idTipoReto == 2) {
                     Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => DebatePage(idReto: reto.idReto, idPersona: idPersona),
-                      )
-                    );
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DebatePage(
+                              idReto: reto.idReto, idPersona: idPersona),
+                        ));
                   } else if (reto.idTipoReto == 3) {
                     return;
                   }
@@ -202,13 +184,33 @@ class _ChallengePageState extends State<ChallengePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  reto.nombreReto,
-                  style: const TextStyle(fontSize: 18, color: Colors.black),
+                  reto.tipoRetoNombre,
+                  style: const TextStyle(
+                    fontSize: 18, // Tamaño más grande para el título
+                    fontWeight: FontWeight.bold, // Negrita para destacar
+                    color: Colors.black,
+                  ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 4),
+                Text(
+                  reto.tipoRetoSubtitulo,
+                  style: const TextStyle(
+                    fontSize: 16, // Un poco más pequeño que el título
+                    fontWeight: FontWeight.w500,
+                    color:
+                        Colors.black, // Color gris para diferenciar del título
+                  ),
+                ),
+                const SizedBox(height: 4),
                 Text(
                   reto.tipoRetoDescripcion,
-                  style: const TextStyle(fontSize: 14, color: Colors.black),
+                  textAlign: TextAlign.justify,
+                  style: const TextStyle(
+                    fontSize: 12, // Tamaño más pequeño para la descripción
+                    fontWeight: FontWeight.normal, // Texto normal
+                    color:
+                        Colors.black87, // Negro más suave para la descripción
+                  ),
                 ),
               ],
             ),

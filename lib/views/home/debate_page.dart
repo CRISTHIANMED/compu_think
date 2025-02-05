@@ -1,6 +1,8 @@
+// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
+import 'package:compu_think/controllers/debate_Controller.dart';
 import 'package:compu_think/utils/widgets/custom_bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DebatePage extends StatefulWidget {
   final int idReto;
@@ -14,47 +16,29 @@ class DebatePage extends StatefulWidget {
 
 class _DebatePageState extends State<DebatePage> {
   final TextEditingController _controller = TextEditingController();
-  final SupabaseClient supabase = Supabase.instance.client;
-  List<Comment> comments = [];
+  final DebateController debateController = DebateController();
+  String nombre = ""; // Nombre completo
+  String userName = ""; // Nombre cusuario
+  String userEmail = ""; // Correo electrónico
 
   @override
   void initState() {
     super.initState();
-    fetchComments();
+    debateController.loadComments(widget.idReto, () => setState(() {}));
+    _loadUserNameUser();
   }
 
-  Future<void> fetchComments() async {
-    final response = await supabase
-        .from('reto_comentario')
-        .select()
-        .eq('id_reto', widget.idReto)
-        .order('fecha', ascending: false);
+  // Método para cargar los datos del usuario desde SharedPreferences
+  Future<void> _loadUserNameUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    final nombre1 = prefs.getString('nombre1') ?? '';
+    final apellido1 = prefs.getString('apellido1') ?? '';
+    final nUsuario = prefs.getString('nUsuario') ?? '';
 
+    // Construir el nombre completo y asignar el correo
     setState(() {
-      comments = response.map((data) => Comment.fromMap(data)).toList();
-    });
-  }
-
-  Future<void> addComment(String text) async {
-    final newComment = {
-      'id_persona': widget.idPersona,
-      'id_reto': widget.idReto,
-      'texto': text,
-      'fecha': DateTime.now().toUtc().toIso8601String(),
-    };
-
-    final response = await supabase.from('reto_comentario').insert(newComment).select().single();
-
-    setState(() {
-      comments.insert(0, Comment.fromMap(response));
-      _controller.clear();
-    });
-  }
-
-  Future<void> deleteComment(int id, int index) async {
-    await supabase.from('reto_comentario').delete().eq('id', id);
-    setState(() {
-      comments.removeAt(index);
+      nombre = "$nombre1 $apellido1 ".replaceAll(RegExp(r'\s+'), ' ').trim();
+      userName = nUsuario;
     });
   }
 
@@ -75,37 +59,56 @@ class _DebatePageState extends State<DebatePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Debate")),
-      bottomNavigationBar: const CustomBottomNavigationBar(
-        currentIndex: 0,
-      ),
+      bottomNavigationBar: const CustomBottomNavigationBar(currentIndex: 0),
       body: Column(
         children: [
           Expanded(
             child: ListView.builder(
-              itemCount: comments.length,
+              itemCount: debateController.comments.length,
               itemBuilder: (context, index) {
+                final comment = debateController.comments[index];
+                final userName =
+                    debateController.getUserName(comment.idPersona);
                 return Card(
-                  margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                  margin:
+                      const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                   child: ListTile(
-                    title: Text(comments[index].user, style: const TextStyle(fontWeight: FontWeight.bold)),
+                    title: Text(
+                      userName,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14, // Tamaño más pequeño para la descripción
+                      ),
+                    ),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(comments[index].text),
+                        Text(comment.texto),
                         const SizedBox(height: 5),
-                        Text(timeAgo(comments[index].timestamp), style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                        Text(timeAgo(comment.fecha),
+                            style: const TextStyle(
+                                color: Colors.grey, fontSize: 12)),
                       ],
                     ),
-                    trailing: PopupMenuButton<String>(
-                      onSelected: (value) {
-                        if (value == 'Eliminar') {
-                          deleteComment(comments[index].id, index);
-                        }
-                      },
-                      itemBuilder: (context) => [
-                        const PopupMenuItem(value: 'Eliminar', child: Text('Eliminar')),
-                      ],
-                    ),
+                    trailing: comment.idPersona == widget.idPersona
+                        ? PopupMenuButton<String>(
+                            onSelected: (value) {
+                              if (value == 'Eliminar') {
+                                debateController.removeComment(
+                                  comment.id,
+                                  index,
+                                  () => setState(() {}),
+                                );
+                              }
+                            },
+                            itemBuilder: (context) => [
+                              const PopupMenuItem(
+                                value: 'Eliminar',
+                                child: Text('Eliminar'),
+                              ),
+                            ],
+                          )
+                        : null,
                   ),
                 );
               },
@@ -119,43 +122,35 @@ class _DebatePageState extends State<DebatePage> {
                   child: TextField(
                     controller: _controller,
                     decoration: const InputDecoration(
-                      hintText: "Escribe un comentario...",
-                      border: OutlineInputBorder(),
-                    ),
+                        hintText: "Escribe un comentario...",
+                        border: OutlineInputBorder()),
                   ),
                 ),
                 const SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: () {
+                IconButton(
+                  icon: const Icon(Icons.send),
+                  onPressed: () async {
                     if (_controller.text.isNotEmpty) {
-                      addComment(_controller.text);
+                      try {
+                        await debateController.addComment(
+                            widget.idPersona,
+                            widget.idReto,
+                            _controller.text,
+                            () => setState(() {}));
+
+                        _controller.clear();
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(e.toString())));
+                      }
                     }
                   },
-                  child: const Text("Enviar"),
-                ),
+                )
               ],
             ),
           ),
         ],
       ),
-    );
-  }
-}
-
-class Comment {
-  int id;
-  String user;
-  String text;
-  DateTime timestamp;
-
-  Comment({required this.id, required this.user, required this.text, required this.timestamp});
-
-  factory Comment.fromMap(Map<String, dynamic> map) {
-    return Comment(
-      id: map['id'],
-      user: 'Usuario ${map['id_persona']}',
-      text: map['texto'],
-      timestamp: DateTime.parse(map['fecha']).toLocal(),
     );
   }
 }

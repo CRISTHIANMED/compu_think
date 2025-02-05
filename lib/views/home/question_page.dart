@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api
+// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
 
 import 'package:compu_think/controllers/challenge_controller.dart';
 import 'package:compu_think/controllers/questions_controller.dart';

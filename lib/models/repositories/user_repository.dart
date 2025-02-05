@@ -6,6 +6,19 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class UserRepository {
   final supabase = Supabase.instance.client;
 
+  Future<List<UserEntity>> fetchAllUsers() async {
+    try {
+      final response = await supabase
+        .from('persona')
+        .select();
+
+      return response.map((data) => UserEntity.fromMap(data)).toList();
+      
+    } catch (e) {
+      throw Exception("Error al obtener usuarios: $e");
+    }
+  }
+
   Future<UserEntity?> fetchUserByEmailOrUsername(
       String input, String contrasena) async {
     try {
@@ -32,4 +45,5 @@ class UserRepository {
       throw Exception(e);
     }
   }
+   
 }

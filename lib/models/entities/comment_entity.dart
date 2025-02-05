@@ -1,11 +1,11 @@
-class RetoComentario {
+class CommentEntity {
   final int id;
   final int idPersona;
   final int idReto;
   final String texto;
   final DateTime fecha;
 
-  RetoComentario({
+  CommentEntity({
     required this.id,
     required this.idPersona,
     required this.idReto,
@@ -14,8 +14,8 @@ class RetoComentario {
   });
 
   // Metodo para convertir un mapa (de la base de datos) a una entidad Unidad
-  factory RetoComentario.fromMap(Map<String, dynamic> map) {
-    return RetoComentario(
+  factory CommentEntity.fromMap(Map<String, dynamic> map) {
+    return CommentEntity(
       id: map['id'] as int,
       idPersona: map['id_persona'] as int,
       idReto: map['id_reto'] as int,

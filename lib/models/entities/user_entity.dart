@@ -22,6 +22,22 @@ class UserEntity {
     required this.rol,
   });
 
+
+  // Constructor para un usuario por defecto
+  factory UserEntity.defaultUser() {
+    return UserEntity(
+      id: 0,
+      email: "usuario@default.com",
+      nombreU: "Usuario",
+      contrasena: "default",
+      nombre1: "Usuario",
+      nombre2: null,
+      apellido1: "Predeterminado",
+      apellido2: null,
+      rol: "Invitado",
+    );
+  }
+
   factory UserEntity.fromMap(Map<String, dynamic> map) {
     return UserEntity(
       id: map['id'],
