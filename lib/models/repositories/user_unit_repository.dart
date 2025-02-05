@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import 'package:compu_think/models/entities/user_unit_entity.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 

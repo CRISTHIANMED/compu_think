@@ -5,7 +5,6 @@ class UserEntity {
   final String? nombre2;
   final String? apellido1;
   final String? apellido2;
-  final String rol;
   final String contrasena;
   final String? nombreU;
   
@@ -19,7 +18,6 @@ class UserEntity {
     required this.nombre2,
     required this.apellido1,
     required this.apellido2,
-    required this.rol,
   });
 
 
@@ -34,7 +32,6 @@ class UserEntity {
       nombre2: null,
       apellido1: "Predeterminado",
       apellido2: null,
-      rol: "Invitado",
     );
   }
 
@@ -46,7 +43,6 @@ class UserEntity {
       nombre2: map['nombre_2'] ?? '',
       apellido1: map['apellido_1'] ?? '',
       apellido2: map['apellido_2'] ?? '',
-      rol: map['rol'] ?? 'est', 
       contrasena: map['contrasena'] ,
       nombreU: map['name_user'] ?? '',
     );
@@ -61,7 +57,6 @@ class UserEntity {
       'nombre_2': nombre2,
       'apellido_1': apellido1,
       'apellido_2': apellido2,
-      'rol': rol,
       'contrasena': contrasena,
       'name_user': nombreU,
     };

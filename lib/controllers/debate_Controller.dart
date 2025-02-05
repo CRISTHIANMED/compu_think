@@ -1,3 +1,4 @@
+// ignore_for_file: file_names
 import 'package:compu_think/models/entities/comment_entity.dart';
 import 'package:compu_think/models/entities/user_entity.dart';
 import 'package:compu_think/models/repositories/comment_repository.dart';

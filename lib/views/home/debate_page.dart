@@ -1,8 +1,8 @@
 // ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
-import 'package:compu_think/controllers/debate_Controller.dart';
+import 'package:compu_think/controllers/debate_controller.dart';
 import 'package:compu_think/utils/widgets/custom_bottom_navigation_bar.dart';
+import 'package:compu_think/utils/widgets/expandable_text.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class DebatePage extends StatefulWidget {
   final int idReto;
@@ -17,29 +17,11 @@ class DebatePage extends StatefulWidget {
 class _DebatePageState extends State<DebatePage> {
   final TextEditingController _controller = TextEditingController();
   final DebateController debateController = DebateController();
-  String nombre = ""; // Nombre completo
-  String userName = ""; // Nombre cusuario
-  String userEmail = ""; // Correo electrónico
 
   @override
   void initState() {
     super.initState();
     debateController.loadComments(widget.idReto, () => setState(() {}));
-    _loadUserNameUser();
-  }
-
-  // Método para cargar los datos del usuario desde SharedPreferences
-  Future<void> _loadUserNameUser() async {
-    final prefs = await SharedPreferences.getInstance();
-    final nombre1 = prefs.getString('nombre1') ?? '';
-    final apellido1 = prefs.getString('apellido1') ?? '';
-    final nUsuario = prefs.getString('nUsuario') ?? '';
-
-    // Construir el nombre completo y asignar el correo
-    setState(() {
-      nombre = "$nombre1 $apellido1 ".replaceAll(RegExp(r'\s+'), ' ').trim();
-      userName = nUsuario;
-    });
   }
 
   String timeAgo(DateTime timestamp) {
@@ -58,7 +40,10 @@ class _DebatePageState extends State<DebatePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Debate")),
+      appBar: AppBar(
+        title: const Text("Debate"),
+        backgroundColor: Colors.blue,
+      ),
       bottomNavigationBar: const CustomBottomNavigationBar(currentIndex: 0),
       body: Column(
         children: [
@@ -83,7 +68,10 @@ class _DebatePageState extends State<DebatePage> {
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(comment.texto),
+                        ExpandableText(
+                          text: comment.texto,
+                          maxLines: 4,
+                        ),
                         const SizedBox(height: 5),
                         Text(timeAgo(comment.fecha),
                             style: const TextStyle(
@@ -119,11 +107,20 @@ class _DebatePageState extends State<DebatePage> {
             child: Row(
               children: [
                 Expanded(
-                  child: TextField(
-                    controller: _controller,
-                    decoration: const InputDecoration(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      maxHeight: 150, // Altura máxima opcional
+                    ),
+                    child: TextField(
+                      controller: _controller,
+                      decoration: const InputDecoration(
                         hintText: "Escribe un comentario...",
-                        border: OutlineInputBorder()),
+                        border: OutlineInputBorder(),
+                      ),
+                      keyboardType: TextInputType.multiline,
+                      maxLines: null, // Permite que crezca dinámicamente
+                      minLines: 1, // Mínima altura
+                    ),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -137,7 +134,6 @@ class _DebatePageState extends State<DebatePage> {
                             widget.idReto,
                             _controller.text,
                             () => setState(() {}));
-
                         _controller.clear();
                       } catch (e) {
                         ScaffoldMessenger.of(context).showSnackBar(

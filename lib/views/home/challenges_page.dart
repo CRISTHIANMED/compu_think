@@ -6,7 +6,6 @@ import 'package:compu_think/views/home/debate_page.dart';
 import 'package:compu_think/views/home/question_page.dart';
 import 'package:flutter/material.dart';
 import 'package:compu_think/utils/widgets/custom_bottom_navigation_bar.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class ChallengePage extends StatefulWidget {
   const ChallengePage({super.key});

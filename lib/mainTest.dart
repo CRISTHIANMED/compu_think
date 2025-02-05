@@ -1,99 +1,83 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:compu_think/services/supabase_service.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-void main() async {
-  // Inicializa Supabase
-    await SupabaseService.init();
+Future<PostgrestResponse<List<Map<String, dynamic>>>> countUserComments(int idPersona, int idReto) async {
+    final supabase = Supabase.instance.client;
 
+  try {
+    final count = await supabase
+        .from('reto_comentario')
+        .select()
+        .eq('id_persona', idPersona)
+        .eq('id_reto', idReto)
+        .count();
+
+    return count;
+
+  } catch (e) {
+    throw Exception("Error al contar comentarios: $e");
+  }
+}
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Inicializa Supabase
+  await SupabaseService.init();
+  
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: PreguntasPage(),
+      title: 'Supabase Test',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: const CommentCountScreen(idPersona: 1, idReto: 2),
     );
   }
 }
 
-class PreguntasPage extends StatefulWidget {
-  const PreguntasPage({super.key});
+class CommentCountScreen extends StatefulWidget {
+  final int idPersona;
+  final int idReto;
+
+  const CommentCountScreen({super.key, required this.idPersona, required this.idReto});
 
   @override
-  _PreguntasPageState createState() => _PreguntasPageState();
+  _CommentCountScreenState createState() => _CommentCountScreenState();
 }
 
-class _PreguntasPageState extends State<PreguntasPage> {
-  final SupabaseClient _supabase = Supabase.instance.client;
-  late Future<List<Map<String, dynamic>>> _preguntas;
+class _CommentCountScreenState extends State<CommentCountScreen> {
+  late Future<int> _commentCount;
 
   @override
-  void initState() {
+  Future<void> initState() async {
     super.initState();
-    // Realizar la consulta al cargar la página
-    _preguntas = getPreguntasByTipoUnidad(1, 1); // Consulta con id_tipo_reto = 1 y id_unidad = 1
+    PostgrestResponse<List<Map<String, dynamic>>> _commentCount = await countUserComments(widget.idPersona, widget.idReto);
   }
-
-  // Método para realizar la consulta
-  Future<List<Map<String, dynamic>>> getPreguntasByTipoUnidad(int idTipoReto, int idUnidad) async {
-    try {
-      final response = await _supabase
-          .from('reto_pregunta')
-          .select('id, titulo, pregunta, url_imagen,' 
-                  'reto_pregunta_opcion(id, descripcion, correcta, url_imagen),' 
-                  'reto(id_unidad, id_tipo_reto)');
-
-      List<Map<String, dynamic>> filteredPreguntas = response.where(
-        (x) => (x["reto"]["id_unidad"] == idUnidad && x["reto"]["id_tipo_reto"] == idTipoReto)).toList();
-
-      return List<Map<String, dynamic>>.from(filteredPreguntas);
-
-    } catch (e) {
-      throw Exception('No se pudieron cargar las preguntas: $e');
-    }
-  }
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Preguntas del Reto'),
-      ),
-      body: FutureBuilder<List<Map<String, dynamic>>>(
-        future: _preguntas,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          }
-
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('No se encontraron preguntas'));
-          }
-
-          // Mostrar los resultados
-          return ListView.builder(
-            itemCount: snapshot.data!.length,
-            itemBuilder: (context, index) {
-              var pregunta = snapshot.data![index];
-              return ListTile(
-                title: Text(pregunta['titulo']),
-                subtitle: Text(pregunta['pregunta']),
-                leading: pregunta['url_imagen'] != null
-                    ? Image.network(pregunta['url_imagen'])
-                    : null,
-              );
-            },
-          );
-        },
+      appBar: AppBar(title: const Text('Conteo de Comentarios')),
+      body: Center(
+        child: FutureBuilder<int>(
+          future: _commentCount,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const CircularProgressIndicator();
+            } else if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            } else {
+              return Text('Comentarios encontrados: ${snapshot.data}');
+            }
+          },
+        ),
       ),
     );
   }
