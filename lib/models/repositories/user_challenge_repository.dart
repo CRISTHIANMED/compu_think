@@ -1,4 +1,3 @@
-
 import 'package:compu_think/models/entities/user_challenge_entity.dart';
 import 'package:compu_think/models/entities/view_detail_challenge_entity.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -55,22 +54,22 @@ class UserChallengeRepository {
   }
 
   /// Actualiza el campo 'Calificacion' basado en los valores de 'id_persona', 'id_unidad' y 'id_tipo reto'
-  Future<void> updateCalificacion(
-      int idPersona, int idUnidad, int idTipoReto, double calificacion) async {
-   
-      final response = await supabase
-          .from('view_detail_reto_persona')
-          .select('id_reto_persona')
-          .eq('id_persona', idPersona)
-          .eq('id_unidad', idUnidad)
-          .eq('id_tipo_reto', idTipoReto)
-          .single();
+  Future<void> updateCalificacion(int idPersona, int idUnidad, int idTipoReto,
+      bool aprobado, double calificacion) async {
+    final response = await supabase
+        .from('view_detail_reto_persona')
+        .select('id_reto_persona')
+        .eq('id_persona', idPersona)
+        .eq('id_unidad', idUnidad)
+        .eq('id_tipo_reto', idTipoReto)
+        .single();
 
-      int idRetoPersona = response['id_reto_persona'];
+    int idRetoPersona = response['id_reto_persona'];
 
-      await supabase
-          .from('reto_persona')
-          .update({'calificacion': calificacion}).eq('id', idRetoPersona);
+    await supabase.from('reto_persona').update({
+      'aprobado': aprobado,
+      'calificacion': calificacion,
+    }).eq('id', idRetoPersona);
   }
 
   Future<List<ViewDetailChallengeEntity>> fetchByIdPersonaAndIdUnidad(

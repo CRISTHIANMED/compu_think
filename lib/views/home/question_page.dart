@@ -115,7 +115,6 @@ class _QuestionPageState extends State<QuestionPage> {
           content: Text("Por favor responde todas las preguntas.")));
       return;
     }
-
     final percentage = calculatePercentage();
 
     final correctAnswers = _questions.where((question) {
@@ -126,6 +125,7 @@ class _QuestionPageState extends State<QuestionPage> {
     }).length;
 
     bool isApproved = percentage >= 50;
+
     String resultMessage =
         isApproved ? "✅ Reto Aprobado" : "❌ Reto No Aprobado";
 
@@ -158,7 +158,7 @@ class _QuestionPageState extends State<QuestionPage> {
                       idRetoPreguntaOpcion: idRetoPreguntaOpcion!);
                 });
 
-                await _challengeController.updateCalificacion(_idPersona, widget.idUnidad, 1, percentage);
+                await _challengeController.updateCalificacion(_idPersona, widget.idUnidad, 1, isApproved, percentage);
 
                 Navigator.pop(context); // Cierra el cuadro de diálogo
                 Navigator.pop(context,true); // Regresa a la pantalla anterior (retos)

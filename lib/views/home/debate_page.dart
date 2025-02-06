@@ -128,16 +128,47 @@ class _DebatePageState extends State<DebatePage> {
                   icon: const Icon(Icons.send),
                   onPressed: () async {
                     if (_controller.text.isNotEmpty) {
+                      // Validar el comentario
+                      if (!debateController.isValidComment(_controller.text)) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: const Text(
+                                'El comentario no tiene suficientes palabras para ser válido.'),
+                            action: SnackBarAction(
+                              label: 'Cerrar', // Etiqueta del botón para cerrar
+                              onPressed: () {
+                                ScaffoldMessenger.of(context)
+                                    .hideCurrentSnackBar();
+                              },
+                            ),
+                            duration: const Duration(
+                                seconds: 2), // Duración más corta si se desea
+                          ),
+                        );
+                        return;
+                      }
                       try {
-                        await debateController.addComment(
-                            widget.idPersona,
-                            widget.idReto,
-                            _controller.text,
-                            () => setState(() {}));
+                        // Llamar a la función addComment
+                        String? resultMessage =
+                            await debateController.addComment(
+                          widget.idPersona,
+                          widget.idReto,
+                          _controller.text,
+                          () => setState(() {}),
+                        );
+
+                        // Limpiar el campo de texto
                         _controller.clear();
+
+                        // Verificar si se completó el reto y mostrar el AlertDialog
+                        if (resultMessage != null) {
+                          _showCompletionDialog(
+                              resultMessage); // Mostrar el mensaje en un AlertDialog
+                        }
                       } catch (e) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(e.toString())));
+                          SnackBar(content: Text(e.toString())),
+                        );
                       }
                     }
                   },
@@ -147,6 +178,33 @@ class _DebatePageState extends State<DebatePage> {
           ),
         ],
       ),
+    );
+  }
+
+  void _showCompletionDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('✅ Reto Aprobado'),
+          content: Text(message), // Mostrar el mensaje que devuelve addComment
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Cerrar el diálogo
+              },
+              child: const Text('Continuar'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Cierra el cuadro de diálogo
+                Navigator.pop(context,true); // Regresa a la pantalla anterior (retos)
+              },
+              child: const Text('Ir a Retos'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

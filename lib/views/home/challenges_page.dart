@@ -166,12 +166,17 @@ class _ChallengePageState extends State<ChallengePage> {
                       setState(() {}); // Asegura que la UI se actualice
                     }
                   } else if (reto.idTipoReto == 2) {
-                    Navigator.push(
-                        context,
+                    final result = await Navigator.push(
+                        context, 
                         MaterialPageRoute(
                           builder: (context) => DebatePage(
                               idReto: reto.idReto, idPersona: idPersona),
                         ));
+                    // Si result es true, recargar los datos
+                    if (result == true) {
+                      _fetchRetos(); // Llama nuevamente la función que carga los datos
+                      setState(() {}); // Asegura que la UI se actualice
+                    }
                   } else if (reto.idTipoReto == 3) {
                     return;
                   }

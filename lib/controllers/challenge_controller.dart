@@ -27,9 +27,9 @@ class ChallengeController {
     }
   }
 
-  Future<void> updateCalificacion(int idPersona, int idUnidad, int idTipoReto, double calificacion) async {
+  Future<void> updateCalificacion(int idPersona, int idUnidad, int idTipoReto, bool aprobado, double calificacion) async {
     try {
-      await _userChallengeRepository.updateCalificacion(idPersona, idUnidad, idTipoReto, calificacion);
+      await _userChallengeRepository.updateCalificacion(idPersona, idUnidad, idTipoReto, aprobado, calificacion);
     } catch (e) {
       // Manejar el error (se puede lanzar una excepción o devolver una lista vacía)
       throw Exception('Error al actualizar la tabla: $e');
