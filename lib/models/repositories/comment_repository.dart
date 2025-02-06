@@ -60,7 +60,8 @@ class CommentRepository {
     }
   }
 
-  Future<void> updateRetoPersona(int idPersona, int idReto, bool aprobado, int calificacion) async {
+  Future<void> updateRetoPersona(
+      int idPersona, int idReto, bool aprobado, int calificacion) async {
     try {
       await supabase.from('reto_persona').update({
         'aprobado': aprobado,
@@ -71,6 +72,17 @@ class CommentRepository {
       });
     } catch (e) {
       throw Exception("Error al actualizar reto_persona: $e");
+    }
+  }
+
+  Future<void> updateComment(int id, String newText) async {
+    try {
+      await supabase.from('reto_comentario').update({
+        'texto': newText,
+        'fecha': DateTime.now().toIso8601String(),
+      }).eq('id', id);
+    } catch (e) {
+      throw Exception("Error al actualizar comentario: $e");
     }
   }
 }

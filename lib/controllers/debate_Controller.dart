@@ -69,7 +69,7 @@ class DebateController {
     if (validWords.length < 10) {
       return false;
     }
-    
+
     return true; // Si pasa la validación, es válido
   }
 
@@ -87,13 +87,25 @@ class DebateController {
       bool isApproved = commentCount >= 3;
 
       // Actualizar el reto siempre
-      await commentRepository.updateRetoPersona(idPersona, idReto, isApproved, calificacion);
+      await commentRepository.updateRetoPersona(
+          idPersona, idReto, isApproved, calificacion);
 
       // Retornar mensaje si el reto está completado solo si el comentario alcanza el mínimo de 3
       return commentCount == 3 ? "¡Felicidades! Has completado el reto." : null;
-
     } catch (e) {
       return "Error al agregar comentario: $e"; // Mensaje de error
+    }
+  }
+
+  Future<void> updateComment(
+      int id, String newText, int index, Function callback) async {
+    try {
+      await commentRepository.updateComment(id, newText);
+      comments[index].texto = newText;
+      comments[index].fecha = DateTime.now();
+      callback();
+    } catch (e) {
+      throw Exception("Error al actualizar comentario: $e");
     }
   }
 }

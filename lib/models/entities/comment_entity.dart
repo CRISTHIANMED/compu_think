@@ -2,8 +2,8 @@ class CommentEntity {
   final int id;
   final int idPersona;
   final int idReto;
-  final String texto;
-  final DateTime fecha;
+  String texto;
+  DateTime fecha;
 
   CommentEntity({
     required this.id,

@@ -1,5 +1,6 @@
 // ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
 import 'package:compu_think/controllers/debate_controller.dart';
+import 'package:compu_think/models/entities/comment_entity.dart';
 import 'package:compu_think/utils/widgets/custom_bottom_navigation_bar.dart';
 import 'package:compu_think/utils/widgets/expandable_text.dart';
 import 'package:flutter/material.dart';
@@ -81,15 +82,17 @@ class _DebatePageState extends State<DebatePage> {
                     trailing: comment.idPersona == widget.idPersona
                         ? PopupMenuButton<String>(
                             onSelected: (value) {
-                              if (value == 'Eliminar') {
-                                debateController.removeComment(
-                                  comment.id,
-                                  index,
-                                  () => setState(() {}),
-                                );
+                              if (value == 'Editar') {
+                                _showEditDialog(comment, index);
+                              } else if (value == 'Eliminar') {
+                                _showDeleteDialog(comment.id, index);
                               }
                             },
                             itemBuilder: (context) => [
+                              const PopupMenuItem(
+                                value: 'Editar',
+                                child: Text('Editar'),
+                              ),
                               const PopupMenuItem(
                                 value: 'Eliminar',
                                 child: Text('Eliminar'),
@@ -198,9 +201,79 @@ class _DebatePageState extends State<DebatePage> {
             TextButton(
               onPressed: () {
                 Navigator.pop(context); // Cierra el cuadro de diálogo
-                Navigator.pop(context,true); // Regresa a la pantalla anterior (retos)
+                Navigator.pop(
+                    context, true); // Regresa a la pantalla anterior (retos)
               },
               child: const Text('Ir a Retos'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showEditDialog(CommentEntity comment, int index) {
+    TextEditingController controller =
+        TextEditingController(text: comment.texto);
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Editar Comentario'),
+          content: TextField(
+            controller: controller,
+            maxLines: 5,
+            decoration: const InputDecoration(
+              hintText: 'Escribe tu comentario...',
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () async {
+                if (controller.text.trim().isNotEmpty) {
+                  await debateController.updateComment(
+                    comment.id,
+                    controller.text.trim(),
+                    index,
+                    () => setState(() {}),
+                  );
+                  Navigator.pop(context);
+                }
+              },
+              child: const Text('Guardar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showDeleteDialog(int commentId, int index) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Eliminar Comentario'),
+          content: const Text(
+              '¿Estás seguro de que quieres eliminar este comentario?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () async {
+                await debateController.removeComment(
+                    commentId, index, () => setState(() {}));
+                Navigator.pop(context);
+              },
+              child:
+                  const Text('Eliminar', style: TextStyle(color: Colors.red)),
             ),
           ],
         );
