@@ -120,7 +120,12 @@ class _LogoutPageState extends State<LogoutPage> {
   // Función para manejar la acción de cerrar sesión
   Future<void> _logout(BuildContext context) async {
     await _authController.clearCredentials();
-    Navigator.pushReplacementNamed(
-        context, '/'); // Vuelve a la pantalla de inicio
+
+    // Elimina todas las rutas anteriores y redirige a la pantalla de inicio ('/')
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      '/',
+      (Route<dynamic> route) => false, // Elimina todas las rutas previas
+    );
   }
 }

@@ -85,7 +85,11 @@ class UnitsPageState extends State<UnitsPage> {
                       decoration: BoxDecoration(
                         color: isEnabled!
                             ? unidad.colorFondo
-                            : unidad.colorFondo.withOpacity(0.6),
+                            : Color.fromRGBO(
+                                unidad.colorFondo.r as int,
+                                unidad.colorFondo.g as int,
+                                unidad.colorFondo.b as int,
+                                0.6),
                         borderRadius: BorderRadius.circular(15),
                         boxShadow: const [
                           BoxShadow(color: Colors.black26, blurRadius: 5),
@@ -96,8 +100,13 @@ class UnitsPageState extends State<UnitsPage> {
                           Opacity(
                             opacity: isEnabled ? 1.0 : 0.5,
                             child: ClipOval(
-                              child: 
-                                _buildImage(unidad.unidadUrlImagen),
+                              child: Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  _buildImage(unidad
+                                      .unidadUrlImagen), // Imagen con loader
+                                ],
+                              ),
                             ),
                           ),
                           const SizedBox(width: 16),
@@ -152,7 +161,8 @@ class UnitsPageState extends State<UnitsPage> {
                                                 context,
                                                 '/Tema',
                                                 arguments: {
-                                                  'id_persona': unidad.idPersona,
+                                                  'id_persona':
+                                                      unidad.idPersona,
                                                   'id_unidad': unidad.idUnidad,
                                                   'tituloUnidad':
                                                       'Unidad ${unidad.unidadOrden}',
@@ -193,6 +203,14 @@ class UnitsPageState extends State<UnitsPage> {
         width: 100,
         height: 100,
         fit: BoxFit.cover,
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) {
+            return child; // Si ya cargó, mostramos la imagen
+          }
+          return const Center(
+            child: CircularProgressIndicator(), // Indicador de carga
+          );
+        },
         errorBuilder: (context, error, stackTrace) {
           return const Text(
             'Error al cargar la imagen',
