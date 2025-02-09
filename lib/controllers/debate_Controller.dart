@@ -75,7 +75,6 @@ class DebateController {
 
   Future<String?> addComment(
       int idPersona, int idReto, String text, Function callback) async {
-    try {
       final newComment =
           await commentRepository.addComment(idPersona, idReto, text);
       comments.insert(0, newComment);
@@ -92,9 +91,6 @@ class DebateController {
 
       // Retornar mensaje si el reto está completado solo si el comentario alcanza el mínimo de 3
       return commentCount == 3 ? "¡Felicidades! Has completado el reto." : null;
-    } catch (e) {
-      return "Error al agregar comentario: $e"; // Mensaje de error
-    }
   }
 
   Future<void> updateComment(

@@ -8,7 +8,8 @@ class AudioViewerPage extends StatefulWidget {
   final String audioUrl;
   final String nombre;
 
-  const AudioViewerPage({super.key, required this.audioUrl, required this.nombre});
+  const AudioViewerPage(
+      {super.key, required this.audioUrl, required this.nombre});
 
   @override
   State<AudioViewerPage> createState() => _AudioViewerPageState();
@@ -24,17 +25,20 @@ class _AudioViewerPageState extends State<AudioViewerPage> {
     _audioPlayer = AudioPlayer();
 
     _audioPlayer.setUrl(widget.audioUrl).then((_) {
-      setState(() {
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }).catchError((error) {
-      // Manejo de errores de carga
-      setState(() {
-        isLoading = false;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error loading audio: $error')),
-      );
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error loading audio: $error')),
+        );
+      }
     });
   }
 
@@ -72,7 +76,8 @@ class _AudioViewerPageState extends State<AudioViewerPage> {
         backgroundColor: Colors.blue.shade700,
       ),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator()) // Indicador de carga
+          ? const Center(
+              child: CircularProgressIndicator()) // Indicador de carga
           : Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -98,7 +103,8 @@ class _AudioViewerPageState extends State<AudioViewerPage> {
                                 : 1.0, // Evitar max = 0
                             onChanged: (value) {
                               if (duration.inSeconds > 0) {
-                                _audioPlayer.seek(Duration(seconds: value.toInt()));
+                                _audioPlayer
+                                    .seek(Duration(seconds: value.toInt()));
                               }
                             },
                             activeColor: Colors.blue.shade600,
@@ -106,7 +112,8 @@ class _AudioViewerPageState extends State<AudioViewerPage> {
                           ),
                           Text(
                             '${_formatDuration(position)} / ${_formatDuration(duration)}',
-                            style: const TextStyle(fontSize: 16, color: Colors.blue),
+                            style: const TextStyle(
+                                fontSize: 16, color: Colors.blue),
                           ),
                         ],
                       );
@@ -118,8 +125,8 @@ class _AudioViewerPageState extends State<AudioViewerPage> {
                     children: [
                       IconButton(
                         onPressed: () {
-                          final newPosition =
-                              _audioPlayer.position - const Duration(seconds: 10);
+                          final newPosition = _audioPlayer.position -
+                              const Duration(seconds: 10);
                           _audioPlayer.seek(newPosition < Duration.zero
                               ? Duration.zero
                               : newPosition);
@@ -146,11 +153,12 @@ class _AudioViewerPageState extends State<AudioViewerPage> {
                       ),
                       IconButton(
                         onPressed: () {
-                          final newPosition =
-                              _audioPlayer.position + const Duration(seconds: 10);
-                          final duration = _audioPlayer.duration ?? Duration.zero;
-                          _audioPlayer
-                              .seek(newPosition > duration ? duration : newPosition);
+                          final newPosition = _audioPlayer.position +
+                              const Duration(seconds: 10);
+                          final duration =
+                              _audioPlayer.duration ?? Duration.zero;
+                          _audioPlayer.seek(
+                              newPosition > duration ? duration : newPosition);
                         },
                         icon: Icon(Icons.forward_10,
                             color: Colors.blue.shade700, size: 32),
@@ -165,7 +173,8 @@ class _AudioViewerPageState extends State<AudioViewerPage> {
                       return Column(
                         children: [
                           const Text('Volume',
-                              style: TextStyle(fontSize: 16, color: Colors.blue)),
+                              style:
+                                  TextStyle(fontSize: 16, color: Colors.blue)),
                           Slider(
                             value: volume,
                             onChanged: (value) {

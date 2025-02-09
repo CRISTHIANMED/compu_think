@@ -1,83 +1,94 @@
-// ignore_for_file: library_private_types_in_public_api
-
-import 'package:compu_think/services/supabase_service.dart';
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 
-Future<PostgrestResponse<List<Map<String, dynamic>>>> countUserComments(int idPersona, int idReto) async {
-    final supabase = Supabase.instance.client;
-
-  try {
-    final count = await supabase
-        .from('reto_comentario')
-        .select()
-        .eq('id_persona', idPersona)
-        .eq('id_reto', idReto)
-        .count();
-
-    return count;
-
-  } catch (e) {
-    throw Exception("Error al contar comentarios: $e");
-  }
-}
-
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // Inicializa Supabase
-  await SupabaseService.init();
-  
-  runApp(MyApp());
+void main() {
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Supabase Test',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: const CommentCountScreen(idPersona: 1, idReto: 2),
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: MapScreen(),
     );
   }
 }
 
-class CommentCountScreen extends StatefulWidget {
-  final int idPersona;
-  final int idReto;
-
-  const CommentCountScreen({super.key, required this.idPersona, required this.idReto});
+class MapScreen extends StatefulWidget {
+  const MapScreen({super.key});
 
   @override
-  _CommentCountScreenState createState() => _CommentCountScreenState();
+  _MapScreenState createState() => _MapScreenState();
 }
 
-class _CommentCountScreenState extends State<CommentCountScreen> {
-  late Future<int> _commentCount;
+class _MapScreenState extends State<MapScreen> {
+  final LatLng _currentLocation = const LatLng(1.214356, -77.278370); // Bogotá por defecto
+  final List<Marker> _markers = [];
 
   @override
-  Future<void> initState() async {
+  void initState() {
     super.initState();
-    PostgrestResponse<List<Map<String, dynamic>>> _commentCount = await countUserComments(widget.idPersona, widget.idReto);
+    _determinePosition();
+    _markers.addAll([
+      _createMarker(const LatLng(1.213339, -77.282552), 'Pregunta 1', '¿Cuál es la capital de Colombia?'),
+      _createMarker(const LatLng(1.214990, -77.276283), 'Pregunta 2', '¿Cuál es la moneda oficial de Colombia?'),
+    ]);
+  }
+
+  Future<void> _determinePosition() async {
+    // Aquí podrías obtener la ubicación actual con `geolocator`
+  }
+
+  Marker _createMarker(LatLng position, String title, String question) {
+    return Marker(
+      point: position,
+      width: 50.0,
+      height: 50.0,
+      child: GestureDetector(
+        onTap: () => _showQuestionDialog(question),
+        child: const Icon(Icons.location_pin, color: Colors.red, size: 40),
+      ),
+    );
+  }
+
+  void _showQuestionDialog(String question) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Pregunta'),
+        content: Text(question),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cerrar'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Conteo de Comentarios')),
-      body: Center(
-        child: FutureBuilder<int>(
-          future: _commentCount,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const CircularProgressIndicator();
-            } else if (snapshot.hasError) {
-              return Text('Error: ${snapshot.error}');
-            } else {
-              return Text('Comentarios encontrados: ${snapshot.data}');
-            }
-          },
+      appBar: AppBar(title: const Text('Mapa con Preguntas')),
+      body: FlutterMap(
+        options: MapOptions(
+          initialCenter: _currentLocation,
+          initialZoom: 12.0,
         ),
+        children: [
+          TileLayer(
+            urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+            userAgentPackageName: 'com.example.app', // Asegura que este parámetro esté presente
+          ),
+          MarkerLayer(
+            markers: _markers, // Aquí agregamos los marcadores
+          ),
+        ],
       ),
     );
   }

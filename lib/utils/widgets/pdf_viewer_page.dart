@@ -26,27 +26,32 @@ class PdfViewerPageState extends State<PdfViewerPage> {
     _downloadAndSavePdf();
   }
 
-  Future<void> _downloadAndSavePdf() async {
-    try {
-      final response = await http.get(Uri.parse(widget.pdfUrl));
-      if (response.statusCode == 200) {
-        final directory = await getApplicationDocumentsDirectory();
-        final file = File('${directory.path}/temp.pdf');
-        await file.writeAsBytes(response.bodyBytes);
+ Future<void> _downloadAndSavePdf() async {
+  try {
+    final response = await http.get(Uri.parse(widget.pdfUrl));
+    if (response.statusCode == 200) {
+      final directory = await getApplicationDocumentsDirectory();
+      final file = File('${directory.path}/temp.pdf');
+      await file.writeAsBytes(response.bodyBytes);
+      if (mounted) {
         setState(() {
           localPath = file.path;
           isLoading = false;
         });
-      } else {
-        throw Exception("Error al descargar el PDF");
       }
-    } catch (e) {
+    } else {
+      throw Exception("Error al descargar el PDF");
+    }
+  } catch (e) {
+    if (mounted) {
       setState(() {
         isLoading = false;
       });
-      _showErrorDialog(e.toString());
     }
+    _showErrorDialog(e.toString());
   }
+}
+
 
   Future<void> _savePdfToDownloads() async {
     try {

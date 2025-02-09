@@ -91,12 +91,12 @@ class _ContentsPageState extends State<ContentsPage> {
               Tab(icon: Icon(Icons.picture_as_pdf), text: "PDF"),
             ],
           ),
-          leading: IconButton(
+          /*leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () {
               Navigator.pop(context); // Regresar a la pantalla anterior
             },
-          ),
+          ),*/
         ),
         body: TabBarView(
           children: [

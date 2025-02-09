@@ -46,8 +46,6 @@ class _ChallengePageState extends State<ChallengePage> {
     }
   }
 
-  
-
   Future<void> _fetchRetos() async {
     try {
       final retos = await _challengeController.fetchByIdPersonaAndIdUnidad(
@@ -74,13 +72,13 @@ class _ChallengePageState extends State<ChallengePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Retos"),
-        leading: IconButton(
+        backgroundColor: Colors.blue,
+        /*leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context);
           },
-        ),
-        backgroundColor: Colors.blue,
+        ),*/
       ),
       body: Padding(
         padding: const EdgeInsets.all(30.0),

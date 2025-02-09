@@ -5,6 +5,7 @@ import 'package:compu_think/controllers/questions_controller.dart';
 import 'package:compu_think/controllers/reponse_controller.dart';
 import 'package:compu_think/models/entities/question_options_entity.dart';
 import 'package:compu_think/utils/helper/convert_google_drive_link.dart';
+import 'package:compu_think/utils/widgets/pdf_viewer_page.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -159,9 +160,10 @@ class _QuestionPageState extends State<QuestionPage> {
                 });
 
                 await _challengeController.updateCalificacion(_idPersona, widget.idUnidad, 1, isApproved, percentage);
-
-                Navigator.pop(context); // Cierra el cuadro de diálogo
-                Navigator.pop(context,true); // Regresa a la pantalla anterior (retos)
+                 if (mounted) {
+                    Navigator.pop(context); // Cierra el cuadro de diálogo
+                    Navigator.pop(context,true); // Regresa a la pantalla anterior (retos)
+                 }
               },
               child: const Text("Continuar"),
             ),
@@ -223,16 +225,30 @@ class _QuestionPageState extends State<QuestionPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Preguntas del reto"),
-        backgroundColor: Colors.blue,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            _confirmExit(context);
-          },
-        ),
-      ),
+     appBar: AppBar(
+  title: const Text("Test"),
+  backgroundColor: Colors.blue,
+  leading: IconButton(
+    icon: const Icon(Icons.arrow_back),
+    onPressed: () {
+      _confirmExit(context);
+    },
+  ),
+  actions: [
+    IconButton(
+      icon: const Icon(Icons.picture_as_pdf), // Icono de PDF
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PdfViewerPage(pdfUrl: '', nombre: '', tema: '',),
+          ),
+        );
+      },
+    ),
+  ],
+),
+
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
