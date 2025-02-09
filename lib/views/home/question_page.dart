@@ -10,8 +10,18 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class QuestionPage extends StatefulWidget {
-  final int idUnidad; // Define la propiedad que almacenará el idUnidad
-  const QuestionPage(this.idUnidad, {super.key});
+  final int idUnidad;
+  final String? urlReto;
+  final String tipoRetoNombre;
+  final String tipoRetoSubtitulo;
+
+  const QuestionPage(
+    this.idUnidad, {
+    super.key,
+    required this.urlReto,
+    required this.tipoRetoNombre,
+    required this.tipoRetoSubtitulo,
+  });
 
   @override
   _QuestionPageState createState() => _QuestionPageState();
@@ -159,11 +169,13 @@ class _QuestionPageState extends State<QuestionPage> {
                       idRetoPreguntaOpcion: idRetoPreguntaOpcion!);
                 });
 
-                await _challengeController.updateCalificacion(_idPersona, widget.idUnidad, 1, isApproved, percentage);
-                 if (mounted) {
-                    Navigator.pop(context); // Cierra el cuadro de diálogo
-                    Navigator.pop(context,true); // Regresa a la pantalla anterior (retos)
-                 }
+                await _challengeController.updateCalificacion(
+                    _idPersona, widget.idUnidad, 1, isApproved, percentage);
+                if (mounted) {
+                  Navigator.pop(context); // Cierra el cuadro de diálogo
+                  Navigator.pop(
+                      context, true); // Regresa a la pantalla anterior (retos)
+                }
               },
               child: const Text("Continuar"),
             ),
@@ -225,30 +237,38 @@ class _QuestionPageState extends State<QuestionPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-     appBar: AppBar(
-  title: const Text("Test"),
-  backgroundColor: Colors.blue,
-  leading: IconButton(
-    icon: const Icon(Icons.arrow_back),
-    onPressed: () {
-      _confirmExit(context);
-    },
-  ),
-  actions: [
-    IconButton(
-      icon: const Icon(Icons.picture_as_pdf), // Icono de PDF
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => PdfViewerPage(pdfUrl: '', nombre: '', tema: '',),
+      appBar: AppBar(
+        title: const Text("Test"),
+        backgroundColor: Colors.blue,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            _confirmExit(context);
+          },
+        ),
+        actions: [
+          Padding(
+            padding:
+                const EdgeInsets.only(right: 16.0), // Ajusta el margen derecho
+            child: IconButton(
+              icon: const Icon(Icons.picture_as_pdf,
+                  size: 35), // Tamaño aumentado
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PdfViewerPage(
+                      pdfUrl: widget.urlReto!,
+                      nombre: widget.tipoRetoNombre,
+                      tema: widget.tipoRetoSubtitulo,
+                    ),
+                  ),
+                );
+              },
+            ),
           ),
-        );
-      },
-    ),
-  ],
-),
-
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -381,6 +401,4 @@ class _QuestionPageState extends State<QuestionPage> {
     _scrollController.dispose();
     super.dispose();
   }
-
-  
 }

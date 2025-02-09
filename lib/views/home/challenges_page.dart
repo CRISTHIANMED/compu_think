@@ -155,7 +155,12 @@ class _ChallengePageState extends State<ChallengePage> {
                     final result = await Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => QuestionPage(idUnidad),
+                        builder: (context) => QuestionPage(
+                          idUnidad,
+                          tipoRetoNombre: reto.tipoRetoNombre,
+                          urlReto: reto.urlReto,
+                          tipoRetoSubtitulo: reto.tipoRetoSubtitulo,
+                        ),
                       ),
                     );
                     // Si result es true, recargar los datos
@@ -165,10 +170,15 @@ class _ChallengePageState extends State<ChallengePage> {
                     }
                   } else if (reto.idTipoReto == 2) {
                     final result = await Navigator.push(
-                        context, 
+                        context,
                         MaterialPageRoute(
                           builder: (context) => DebatePage(
-                              idReto: reto.idReto, idPersona: idPersona),
+                            idReto: reto.idReto,
+                            idPersona: idPersona,
+                            tipoRetoNombre: reto.tipoRetoNombre,
+                            urlReto: reto.urlReto,
+                            tipoRetoSubtitulo: reto.tipoRetoSubtitulo,
+                          ),
                         ));
                     // Si result es true, recargar los datos
                     if (result == true) {

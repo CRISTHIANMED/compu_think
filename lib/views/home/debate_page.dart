@@ -3,13 +3,23 @@ import 'package:compu_think/controllers/debate_controller.dart';
 import 'package:compu_think/models/entities/comment_entity.dart';
 import 'package:compu_think/utils/widgets/custom_bottom_navigation_bar.dart';
 import 'package:compu_think/utils/widgets/expandable_text.dart';
+import 'package:compu_think/utils/widgets/pdf_viewer_page.dart';
 import 'package:flutter/material.dart';
 
 class DebatePage extends StatefulWidget {
   final int idReto;
   final int idPersona;
+  final String tipoRetoNombre;
+  final String? urlReto;
+  final String tipoRetoSubtitulo;
 
-  const DebatePage({super.key, required this.idReto, required this.idPersona});
+  const DebatePage(
+      {super.key,
+      required this.idReto,
+      required this.idPersona,
+      required this.tipoRetoNombre,
+      required this.urlReto,
+      required this.tipoRetoSubtitulo,});
 
   @override
   _DebatePageState createState() => _DebatePageState();
@@ -44,6 +54,28 @@ class _DebatePageState extends State<DebatePage> {
       appBar: AppBar(
         title: const Text("Debate"),
         backgroundColor: Colors.blue,
+        actions: [
+          Padding(
+            padding:
+                const EdgeInsets.only(right: 16.0), // Ajusta el margen derecho
+            child: IconButton(
+              icon: const Icon(Icons.picture_as_pdf,
+                  size: 35), // Tamaño aumentado
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PdfViewerPage(
+                      pdfUrl: widget.urlReto!,
+                      nombre: widget.tipoRetoNombre,
+                      tema: widget.tipoRetoSubtitulo,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
       bottomNavigationBar: const CustomBottomNavigationBar(currentIndex: 0),
       body: Column(
