@@ -85,11 +85,7 @@ class UnitsPageState extends State<UnitsPage> {
                       decoration: BoxDecoration(
                         color: isEnabled!
                             ? unidad.colorFondo
-                            : Color.fromRGBO(
-                                unidad.colorFondo.r as int,
-                                unidad.colorFondo.g as int,
-                                unidad.colorFondo.b as int,
-                                0.6),
+                            : unidad.colorFondo.withOpacity(0.6),
                         borderRadius: BorderRadius.circular(15),
                         boxShadow: const [
                           BoxShadow(color: Colors.black26, blurRadius: 5),

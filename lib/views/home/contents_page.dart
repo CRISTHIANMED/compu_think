@@ -80,7 +80,12 @@ class _ContentsPageState extends State<ContentsPage> {
         appBar: AppBar(
           title: Row(
             children: [
-              Text(titulo),
+              Expanded(
+                child: Text(
+                  titulo,
+                  softWrap: true, // ✅ Permite varias líneas
+                ),
+              ),
             ],
           ),
           backgroundColor: Colors.blue,
@@ -163,19 +168,20 @@ class _ContentsPageState extends State<ContentsPage> {
                 }
                 if (tipoContenido == 'pdf') {
                   // Validar si la URL es válida usando convertGoogleDriveLink
-                try {
-                  url = convertGoogleDriveLink(url); // Intenta convertir la URL
-                } catch (e) {
-                  return const Text(
-                    'URL no válida',
-                    style: TextStyle(color: Colors.red),
-                  );
-                }
+                  try {
+                    url =
+                        convertGoogleDriveLink(url); // Intenta convertir la URL
+                  } catch (e) {
+                    return const Text(
+                      'URL no válida',
+                      style: TextStyle(color: Colors.red),
+                    );
+                  }
                   return MediaItem(
                     name: nombre,
                     type: tipoContenido,
-                    pageRoute: (context) =>
-                        PdfViewerPage(pdfUrl: url, nombre: nombre, tema:content.temaTitulo),
+                    pageRoute: (context) => PdfViewerPage(
+                        pdfUrl: url, nombre: nombre, tema: content.temaTitulo),
                   );
                 }
                 return Container();
