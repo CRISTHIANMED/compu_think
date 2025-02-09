@@ -13,13 +13,14 @@ class DebatePage extends StatefulWidget {
   final String? urlReto;
   final String tipoRetoSubtitulo;
 
-  const DebatePage(
-      {super.key,
-      required this.idReto,
-      required this.idPersona,
-      required this.tipoRetoNombre,
-      required this.urlReto,
-      required this.tipoRetoSubtitulo,});
+  const DebatePage({
+    super.key,
+    required this.idReto,
+    required this.idPersona,
+    required this.tipoRetoNombre,
+    required this.urlReto,
+    required this.tipoRetoSubtitulo,
+  });
 
   @override
   _DebatePageState createState() => _DebatePageState();
