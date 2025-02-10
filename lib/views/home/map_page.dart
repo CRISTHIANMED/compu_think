@@ -1,4 +1,5 @@
 // ignore_for_file: library_private_types_in_public_api
+import 'package:compu_think/controllers/challenge_controller.dart';
 import 'package:compu_think/controllers/geo_controller.dart';
 import 'package:compu_think/controllers/questions_controller.dart';
 import 'package:compu_think/controllers/reponse_controller.dart';
@@ -50,8 +51,8 @@ class _MapPageState extends State<MapPage> {
   final GeoController _geoController = GeoController();
   final ReponseController _reponseController = ReponseController();
   final QuestionController _questionController = QuestionController();
+  final ChallengeController _challengeController = ChallengeController();
 
-  
   @override
   void initState() {
     super.initState();
@@ -70,7 +71,7 @@ class _MapPageState extends State<MapPage> {
           _questionLocations = questionLocations;
         });
       }
-      _initMap(); 
+      _initMap();
     } catch (e) {
       if (mounted) {
         setState(() {
@@ -230,23 +231,25 @@ class _MapPageState extends State<MapPage> {
                   Text(question.questionText),
                   const SizedBox(height: 10),
                   ...question.options.map((option) {
-                    return RadioListTile<Option>(
+                    return RadioListTile<int>(
                       title: Text(option.description),
-                      value: option,
-                      groupValue: selectedOption,
-                      onChanged: (Option? value) {
+                      value: option.id,
+                      groupValue: selectedAnswers[question.id],
+                      onChanged: (value) {
                         setState(() {
-                          selectedOption = value;
+                          selectedAnswers[question.id] = value;
                         });
+                        _saveAnswer(question.id, value!);
                       },
                     );
                   }),
                   ElevatedButton(
-                    onPressed: selectedOption == null
+                    onPressed: selectedAnswers[question.id] == null
                         ? null
                         : () {
                             Navigator.pop(context);
-                            _showAnswerDialog(selectedOption!.isCorrect);
+                            _checkAnswer(question, question.id,
+                                selectedAnswers[question.id]);
                           },
                     child: const Text("Enviar Respuesta"),
                   ),
@@ -259,16 +262,104 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
+  void showResult() {
+    final percentage = calculatePercentage();
+
+    final correctAnswers = _questions.where((question) {
+      final selectedOptionId = selectedAnswers[question.id];
+      final correctOption = question.getCorrectOption();
+
+      return selectedOptionId != null && correctOption?.id == selectedOptionId;
+    }).length;
+
+    bool isApproved = percentage >= 50;
+
+    String resultMessage =
+        isApproved ? "✅ Reto Aprobado" : "❌ Reto No Aprobado";
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(resultMessage, textAlign: TextAlign.center),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text("Porcentaje de aciertos: ${percentage.toStringAsFixed(2)}%"),
+              const SizedBox(height: 8),
+              Text("$correctAnswers/${_questions.length} preguntas acertadas."),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Cierra el cuadro de diálogo
+              },
+              child: const Text("Intentar de nuevo"),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                await _challengeController.updateCalificacion(
+                    _idPersona, widget.idUnidad, 3, isApproved, percentage);
+                if (mounted) {
+                  Navigator.pop(context); // Cierra el cuadro de diálogo
+                  Navigator.pop(
+                      context, true); // Regresa a la pantalla anterior (retos)
+                }
+              },
+              child: const Text("Continuar"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Mostrar el resultado de la respuesta
+  void _checkAnswer(Question question, idRetoPregunta, idRetoPreguntaOpcion) {
+    int? selectedOptionId = selectedAnswers[question.id];
+
+    if (selectedOptionId == null) return; // No hacer nada si no hay selección
+
+    // Buscar la opción seleccionada en las opciones de la pregunta
+    Option? selectedOption = question.options.firstWhere(
+      (option) => option.id == selectedOptionId,
+      orElse: () =>
+          Option(id: -1, description: "Opción inválida", isCorrect: false),
+    );
+
+    // Verificar si la opción es correcta o incorrecta
+    bool isCorrect = selectedOption.isCorrect;
+
+    // Mostrar el resultado en un diálogo
+    _showAnswerDialog(isCorrect);
+
+    _reponseController.saveResponse(
+        idPersona: _idPersona,
+        idRetoPregunta: idRetoPregunta,
+        idRetoPreguntaOpcion: idRetoPreguntaOpcion!);
+
+  }
+
   void _showAnswerDialog(bool isCorrect) {
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text(isCorrect ? "Correcto!" : "Incorrecto"),
+          title: Text(isCorrect ? "✅ Correcto!" : "❌ Incorrecto"),
           content: Text(isCorrect ? "¡Bien hecho!" : "Intenta de nuevo."),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () {
+                Navigator.pop(context);
+
+                // Después de cerrar el diálogo, verificar si todas las preguntas han sido respondidas
+                Future.delayed(const Duration(milliseconds: 300), () {
+                  if (areAllQuestionsAnswered()) {
+                    showResult();
+                  }
+                });
+              },
               child: const Text("Cerrar"),
             )
           ],
@@ -297,7 +388,10 @@ class _MapPageState extends State<MapPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Mapa de Preguntas")),
+      appBar: AppBar(
+        title: const Text("Mapa de Preguntas"),
+        backgroundColor: Colors.blue,
+        ),
       body: Stack(
         children: [
           FlutterMap(
@@ -370,7 +464,6 @@ class _MapPageState extends State<MapPage> {
           ),
         ],
       ),
-      
     );
   }
 }
