@@ -3,6 +3,7 @@
 import 'package:compu_think/controllers/challenge_controller.dart';
 import 'package:compu_think/models/entities/view_detail_challenge_entity.dart';
 import 'package:compu_think/views/home/debate_page.dart';
+import 'package:compu_think/views/home/map_page.dart';
 import 'package:compu_think/views/home/question_page.dart';
 import 'package:flutter/material.dart';
 import 'package:compu_think/utils/widgets/custom_bottom_navigation_bar.dart';
@@ -73,12 +74,12 @@ class _ChallengePageState extends State<ChallengePage> {
       appBar: AppBar(
         title: const Text("Retos"),
         backgroundColor: Colors.blue,
-        /*leading: IconButton(
+        leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context);
           },
-        ),*/
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(30.0),
@@ -186,7 +187,16 @@ class _ChallengePageState extends State<ChallengePage> {
                       setState(() {}); // Asegura que la UI se actualice
                     }
                   } else if (reto.idTipoReto == 3) {
-                    return;
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MapPage(
+                            idUnidad,
+                            tipoRetoNombre: reto.tipoRetoNombre,
+                            urlReto: reto.urlReto,
+                            tipoRetoSubtitulo: reto.tipoRetoSubtitulo,
+                          ),
+                        ));
                   }
                 }
               : null,

@@ -50,10 +50,10 @@ class ReponseController {
 
   // Obtener respuestas por persona y unidad de vista detalles
   Future<List<Map<String, dynamic>>> fetchViewResponceByIdPersonIdUnidad(
-      int idPersona, int idUnidad) async {
+      int idPersona, int idUnidad, int idTipoReto) async {
     try {
       final content = _reponseRepository.fetchViewResponceByIdPersonIdUnidad(
-          idPersona, idUnidad);
+          idPersona, idUnidad, idTipoReto);
       return content;
     } catch (e) {
       throw Exception('Error al obtener respuestas: $e');

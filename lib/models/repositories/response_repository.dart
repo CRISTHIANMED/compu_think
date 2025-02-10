@@ -35,12 +35,13 @@ class ResponseRepository {
   }
 
   // Obtener respuestas por persona y unidad de vista detalles
-  Future<List<Map<String, dynamic>>> fetchViewResponceByIdPersonIdUnidad(int idPersona, int idUnidad) async {
+  Future<List<Map<String, dynamic>>> fetchViewResponceByIdPersonIdUnidad(int idPersona, int idUnidad, int idTipoReto) async {
     final response = await supabase
         .from('view_detail_respuestas')
         .select('id_persona, id_reto_pregunta, id_reto_pregunta_opcion, id_unidad, id_tipo_reto')
         .eq('id_persona', idPersona)
-        .eq('id_unidad', idUnidad);
+        .eq('id_unidad', idUnidad)
+        .eq('id_tipo_reto', idTipoReto);
 
     return response;
   }

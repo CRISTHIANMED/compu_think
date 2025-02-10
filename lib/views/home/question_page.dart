@@ -57,9 +57,9 @@ class _QuestionPageState extends State<QuestionPage> {
           await _questionController.fetchQuestions(idTipoReto, idUnidad);
 
       final responses = await _reponseController
-          .fetchViewResponceByIdPersonIdUnidad(idPersona, idUnidad);
+          .fetchViewResponceByIdPersonIdUnidad(idPersona, idUnidad, 1);
 
-      _saveAnswerDataBase(responses, idPersona, idUnidad);
+      _saveAnswerDataBase(responses);
 
       if (mounted) {
         setState(() {
@@ -84,7 +84,7 @@ class _QuestionPageState extends State<QuestionPage> {
   }
 
   Future<void> _saveAnswerDataBase(
-      List<Map<String, dynamic>> responses, int idPersona, int idUnidad) async {
+      List<Map<String, dynamic>> responses) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (responses.isNotEmpty) {
       for (var response in responses) {

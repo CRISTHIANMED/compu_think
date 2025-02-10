@@ -1,6 +1,7 @@
 // ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
 import 'package:compu_think/controllers/debate_controller.dart';
 import 'package:compu_think/models/entities/comment_entity.dart';
+import 'package:compu_think/utils/helper/convert_google_drive_link.dart';
 import 'package:compu_think/utils/widgets/custom_bottom_navigation_bar.dart';
 import 'package:compu_think/utils/widgets/expandable_text.dart';
 import 'package:compu_think/utils/widgets/pdf_viewer_page.dart';

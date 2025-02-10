@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:compu_think/utils/helper/convert_google_drive_link.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:path_provider/path_provider.dart';
@@ -28,7 +29,7 @@ class PdfViewerPageState extends State<PdfViewerPage> {
 
  Future<void> _downloadAndSavePdf() async {
   try {
-    final response = await http.get(Uri.parse(widget.pdfUrl));
+    final response = await http.get(Uri.parse(convertGoogleDriveLink(widget.pdfUrl)));
     if (response.statusCode == 200) {
       final directory = await getApplicationDocumentsDirectory();
       final file = File('${directory.path}/temp.pdf');
