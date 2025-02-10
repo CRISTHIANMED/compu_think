@@ -5,6 +5,7 @@ import 'package:compu_think/controllers/questions_controller.dart';
 import 'package:compu_think/controllers/reponse_controller.dart';
 import 'package:compu_think/models/entities/question_options_entity.dart';
 import 'package:compu_think/utils/helper/convert_google_drive_link.dart';
+import 'package:compu_think/utils/widgets/pdf_viewer_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
@@ -431,6 +432,28 @@ class _MapPageState extends State<MapPage> {
       appBar: AppBar(
         title: const Text("Mapa de Preguntas"),
         backgroundColor: Colors.blue,
+        actions: [
+          Padding(
+            padding:
+                const EdgeInsets.only(right: 16.0), // Ajusta el margen derecho
+            child: IconButton(
+              icon: const Icon(Icons.picture_as_pdf,
+                  size: 35), // Tamaño aumentado
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PdfViewerPage(
+                      pdfUrl: widget.urlReto!,
+                      nombre: widget.tipoRetoNombre,
+                      tema: widget.tipoRetoSubtitulo,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
       body: Stack(
         children: [
