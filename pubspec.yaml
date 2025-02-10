@@ -60,6 +60,12 @@ dependencies:
   flutter_linkify: ^6.0.0
   flutter_map_tile_caching: ^10.0.0
   flutter_cache_manager: ^3.4.1
+  flutter_launcher_icons: ^0.14.3
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/icons/icon_app.png" # Ruta a tu imagen de icono
 
 dev_dependencies:
   flutter_test:
