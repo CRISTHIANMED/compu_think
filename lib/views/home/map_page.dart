@@ -1,9 +1,10 @@
-// ignore_for_file: library_private_types_in_public_api
+// ignore_for_file: library_private_types_in_public_api, unused_field
 import 'package:compu_think/controllers/challenge_controller.dart';
 import 'package:compu_think/controllers/geo_controller.dart';
 import 'package:compu_think/controllers/questions_controller.dart';
 import 'package:compu_think/controllers/reponse_controller.dart';
 import 'package:compu_think/models/entities/question_options_entity.dart';
+import 'package:compu_think/utils/helper/convert_google_drive_link.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
@@ -217,43 +218,62 @@ class _MapPageState extends State<MapPage> {
           builder: (context, setState) {
             return Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    question.title,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+              child: SingleChildScrollView(
+                // Agregar SingleChildScrollView
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      question.title,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(question.questionText),
-                  const SizedBox(height: 10),
-                  ...question.options.map((option) {
-                    return RadioListTile<int>(
-                      title: Text(option.description),
-                      value: option.id,
-                      groupValue: selectedAnswers[question.id],
-                      onChanged: (value) {
-                        setState(() {
-                          selectedAnswers[question.id] = value;
-                        });
-                        _saveAnswer(question.id, value!);
-                      },
-                    );
-                  }),
-                  ElevatedButton(
-                    onPressed: selectedAnswers[question.id] == null
-                        ? null
-                        : () {
-                            Navigator.pop(context);
-                            _checkAnswer(question, question.id,
-                                selectedAnswers[question.id]);
-                          },
-                    child: const Text("Enviar Respuesta"),
-                  ),
-                ],
+                    const SizedBox(height: 10),
+                    Text(question.questionText),
+                    if (question.imageUrl != null) ...[
+                      const SizedBox(height: 8),
+                      _buildImage(question.imageUrl!),
+                    ],
+                    const SizedBox(height: 10),
+                    ...question.options.map((option) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          RadioListTile<int>(
+                            title: Text(option.description),
+                            value: option.id,
+                            groupValue: selectedAnswers[question.id],
+                            onChanged: (value) {
+                              setState(() {
+                                selectedAnswers[question.id] = value;
+                              });
+                              _saveAnswer(question.id, value!);
+                            },
+                          ),
+                          if (option.imageUrl != null) ...[
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 16.0), // Alinear con el texto
+                              child: _buildImage(option.imageUrl!),
+                            ),
+                          ],
+                        ],
+                      );
+                    }),
+                    ElevatedButton(
+                      onPressed: selectedAnswers[question.id] == null
+                          ? null
+                          : () {
+                              Navigator.pop(context);
+                              _checkAnswer(question, question.id,
+                                  selectedAnswers[question.id]);
+                            },
+                      child: const Text("Enviar Respuesta"),
+                    ),
+                  ],
+                ),
               ),
             );
           },
@@ -338,7 +358,6 @@ class _MapPageState extends State<MapPage> {
         idPersona: _idPersona,
         idRetoPregunta: idRetoPregunta,
         idRetoPreguntaOpcion: idRetoPreguntaOpcion!);
-
   }
 
   void _showAnswerDialog(bool isCorrect) {
@@ -385,83 +404,118 @@ class _MapPageState extends State<MapPage> {
     return LatLng(sumLat / total, sumLng / total);
   }
 
+  Widget _buildImage(String? url) {
+    if (url == null || url.isEmpty) {
+      return const SizedBox(); // Retorna un widget vacío si la URL es null o está vacía
+    }
+
+    String imageUrl = convertGoogleDriveLink(url);
+
+    return FutureBuilder(
+      future: precacheImage(NetworkImage(imageUrl), context),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return const Icon(Icons.error, size: 50, color: Colors.red);
+        } else {
+          return Image.network(imageUrl);
+        }
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Mapa de Preguntas"),
         backgroundColor: Colors.blue,
-        ),
+      ),
       body: Stack(
         children: [
-          FlutterMap(
-            mapController: _mapController,
-            options: MapOptions(
-              initialCenter: _calculateCenter(_questionLocations),
-              initialZoom: 15.0,
-              onPositionChanged: (position, hasGesture) {
-                if (hasGesture) {
-                  setState(() {
-                    mapMode =
-                        3; // Activa modo manual cuando el usuario mueve el mapa
-                  });
-                }
-              },
-            ),
+          // Mapa y contenido
+          Stack(
             children: [
-              TileLayer(
-                urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-                //urlTemplate: "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
-                //subdomains: const ['a', 'b', 'c'],
-                retinaMode: RetinaMode.isHighDensity(
-                    context), // Habilita Retina si la pantalla lo necesita
-              ),
-              MarkerLayer(
-                markers: [
-                  ..._questions.map((question) {
-                    LatLng? location = _questionLocations[question.id];
-                    if (location == null) {
-                      return null; // Ignorar si no hay ubicación
+              FlutterMap(
+                mapController: _mapController,
+                options: MapOptions(
+                  initialCenter: _calculateCenter(_questionLocations),
+                  initialZoom: 15.0,
+                  onPositionChanged: (position, hasGesture) {
+                    if (hasGesture) {
+                      setState(() {
+                        mapMode =
+                            3; // Activa modo manual cuando el usuario mueve el mapa
+                      });
                     }
-                    return Marker(
-                      width: 40.0,
-                      height: 40.0,
-                      point: location,
-                      child: GestureDetector(
-                        onTap: () => _showQuestionDialog(question),
-                        child: const Icon(
-                          Icons.location_on_rounded,
-                          color: Colors.red,
-                          size: 50,
-                        ),
-                      ),
-                    );
-                  }).whereType<Marker>(), // Filtra los valores nulos
+                  },
+                ),
+                children: [
+                  TileLayer(
+                    urlTemplate:
+                        "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                    retinaMode: RetinaMode.isHighDensity(context),
+                  ),
+                  MarkerLayer(
+                    markers: [
+                      ..._questions.map((question) {
+                        LatLng? location = _questionLocations[question.id];
+                        if (location == null) {
+                          return null; // Ignorar si no hay ubicación
+                        }
+                        return Marker(
+                          width: 40.0,
+                          height: 40.0,
+                          point: location,
+                          child: GestureDetector(
+                            onTap: () => _showQuestionDialog(question),
+                            child: const Icon(
+                              Icons.location_on_rounded,
+                              color: Colors.red,
+                              size: 50,
+                            ),
+                          ),
+                        );
+                      }).whereType<Marker>(), // Filtra los valores nulos
+                    ],
+                  ),
+                  CurrentLocationLayer(
+                    positionStream: _positionStream(),
+                    alignPositionOnUpdate: (mapMode == 1 && centrarUsuario)
+                        ? AlignOnUpdate.always
+                        : AlignOnUpdate.never,
+                    alignDirectionOnUpdate: AlignOnUpdate.never,
+                    style: const LocationMarkerStyle(
+                      marker: DefaultLocationMarker(color: Colors.blue),
+                      showAccuracyCircle: true,
+                    ),
+                  ),
                 ],
               ),
-              CurrentLocationLayer(
-                positionStream: _positionStream(),
-                alignPositionOnUpdate: (mapMode == 1 && centrarUsuario)
-                    ? AlignOnUpdate.always
-                    : AlignOnUpdate.never,
-                alignDirectionOnUpdate: AlignOnUpdate.never,
-                style: const LocationMarkerStyle(
-                  marker: DefaultLocationMarker(color: Colors.blue),
-                  showAccuracyCircle: true,
+              Positioned(
+                bottom: 20,
+                right: 20,
+                child: FloatingActionButton(
+                  onPressed: _toggleGpsMode,
+                  child: Icon(
+                    mapMode == 1 ? Icons.gps_fixed : Icons.gps_not_fixed,
+                  ),
                 ),
-              )
+              ),
             ],
           ),
-          Positioned(
-            bottom: 20,
-            right: 20,
-            child: FloatingActionButton(
-              onPressed: _toggleGpsMode,
-              child: Icon(
-                mapMode == 1 ? Icons.gps_fixed : Icons.gps_not_fixed,
+
+          // Indicador de carga
+          if (_isLoading)
+            Positioned.fill(
+              child: Container(
+                color: Colors.black.withAlpha(77), // Fondo semitransparente
+                child: const Center(
+                  child: CircularProgressIndicator(),
+                ),
               ),
             ),
-          ),
         ],
       ),
     );

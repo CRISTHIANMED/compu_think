@@ -187,7 +187,7 @@ class _ChallengePageState extends State<ChallengePage> {
                       setState(() {}); // Asegura que la UI se actualice
                     }
                   } else if (reto.idTipoReto == 3) {
-                    Navigator.push(
+                    final result = await Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => MapPage(
@@ -197,6 +197,12 @@ class _ChallengePageState extends State<ChallengePage> {
                             tipoRetoSubtitulo: reto.tipoRetoSubtitulo,
                           ),
                         ));
+                    // Si result es true, recargar los datos
+                    if (result == true) {
+                      _fetchRetos(); // Llama nuevamente la función que carga los datos
+                      setState(() {}); // Asegura que la UI se actualice
+                      _showCongratulationsDialog();
+                    }
                   }
                 }
               : null,
@@ -239,6 +245,41 @@ class _ChallengePageState extends State<ChallengePage> {
           ),
         ),
       ),
+    );
+  }
+
+  // Función para mostrar el cuadro de diálogo
+  void _showCongratulationsDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Row(
+            children: [
+              Icon(Icons.tag_faces, color: Colors.blue, size: 30),
+              SizedBox(width: 15),
+              Text("¡Felicidades!"),
+            ],
+          ),
+          content: const Text(
+            "Unidad aprobada. ¡Puedes continuar con el siguiente reto!",
+            style: TextStyle(fontSize: 16),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Cierra el diálogo
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  '/Unidad', // Ruta que apunta a la página de unidades
+                  (route) => false, // Elimina todas las rutas anteriores
+                );
+              },
+              child: const Text("Continuar"),
+            ),
+          ],
+        );
+      },
     );
   }
 }
