@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 
-void main() {
-  runApp(MyApp());
+
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
@@ -64,7 +71,12 @@ class MapScreen extends StatefulWidget {
 }
 
 class _MapScreenState extends State<MapScreen> {
-  LatLng currentLocation = const LatLng(1.2136, -77.2811); // Pasto, Nariño
+  LatLng currentLocation = const LatLng(1.2136, -77.2811);
+  late final MapController _mapController;
+  int mapMode = 1; // 1: gps_fixed, 3: gps_not_fixed
+
+  bool alignOnUpdate = false;
+  bool alignDirection = false;
   Option? selectedOption;
 
   List<Question> questions = [
@@ -109,29 +121,50 @@ class _MapScreenState extends State<MapScreen> {
   @override
   void initState() {
     super.initState();
-    _determinePosition();
+    _mapController = MapController();
+    _checkPermissions();
   }
 
-  Future<void> _determinePosition() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return;
-    }
-
-    permission = await Geolocator.checkPermission();
+  Future<void> _checkPermissions() async {
+    LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.deniedForever) {
+      if (permission == LocationPermission.denied) {
         return;
       }
     }
+    if (permission == LocationPermission.deniedForever) {
+      return;
+    }
+  }
 
+  void _toggleGpsMode() async {
+    if (mapMode == 1) {
+      setState(() {
+        mapMode = 3; // Permite mover manualmente
+      });
+    } else {
+      _setMode1();
+    }
+  }
+
+  void _setMode1() async {
     Position position = await Geolocator.getCurrentPosition();
+    LatLng newLocation = LatLng(position.latitude, position.longitude);
     setState(() {
-      currentLocation = LatLng(position.latitude, position.longitude);
+      mapMode = 1;
+    });
+    _mapController.rotate(0);
+    _mapController.move(newLocation, 18.0);
+  }
+
+  Stream<LocationMarkerPosition?> _positionStream() {
+    return Geolocator.getPositionStream().map((Position position) {
+      return LocationMarkerPosition(
+        latitude: position.latitude,
+        longitude: position.longitude,
+        accuracy: position.accuracy,
+      );
     });
   }
 
@@ -148,8 +181,8 @@ class _MapScreenState extends State<MapScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(question.title,
-                      style:
-                          const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                      style: const TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 10),
                   Text(question.questionText),
                   const SizedBox(height: 10),
@@ -170,8 +203,7 @@ class _MapScreenState extends State<MapScreen> {
                         ? null
                         : () {
                             Navigator.pop(context);
-                            _showAnswerDialog(
-                                selectedOption!.isCorrect, question);
+                            _showAnswerDialog(selectedOption!.isCorrect);
                           },
                     child: const Text("Enviar Respuesta"),
                   ),
@@ -184,26 +216,18 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
-  void _showAnswerDialog(bool isCorrect, Question question) {
+  void _showAnswerDialog(bool isCorrect) {
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text(isCorrect ? "¡Correcto!" : "Incorrecto"),
+          title: Text(isCorrect ? "Correcto!" : "Incorrecto"),
           content: Text(isCorrect ? "¡Bien hecho!" : "Intenta de nuevo."),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
               child: const Text("Cerrar"),
-            ),
-            if (!isCorrect)
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context); // Cierra el diálogo de respuesta
-                  _showQuestionDialog(question); // Vuelve a mostrar la pregunta
-                },
-                child: const Text("Intentar de nuevo"),
-              ),
+            )
           ],
         );
       },
@@ -217,13 +241,25 @@ class _MapScreenState extends State<MapScreen> {
       body: Stack(
         children: [
           FlutterMap(
+            mapController: _mapController,
             options: MapOptions(
-              initialCenter: currentLocation,
-              initialZoom: 15.0,
+              initialCenter: const LatLng(1.2136, -77.2811),
+              initialZoom: 18.0,
+              onPositionChanged: (position, hasGesture) {
+                if (hasGesture) {
+                  setState(() {
+                    mapMode =
+                        3; // Activa modo manual cuando el usuario mueve el mapa
+                  });
+                }
+              },
             ),
             children: [
               TileLayer(
                 urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                //urlTemplate: "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+                //subdomains: const ['a', 'b', 'c'],
+                retinaMode: RetinaMode.isHighDensity(context), // Habilita Retina si la pantalla lo necesita
               ),
               MarkerLayer(
                 markers: [
@@ -234,19 +270,23 @@ class _MapScreenState extends State<MapScreen> {
                       point: questionLocations[index],
                       child: GestureDetector(
                         onTap: () => _showQuestionDialog(questions[index]),
-                        child: const Icon(Icons.location_on,
-                            color: Colors.red, size: 40),
+                        child: const Icon(Icons.location_on_rounded,
+                            color: Colors.red, size: 50),
                       ),
                     );
                   }),
-                  Marker(
-                    width: 40.0,
-                    height: 40.0,
-                    point: currentLocation,
-                    child: const Icon(Icons.person_pin_circle,
-                        color: Colors.blue, size: 40),
-                  ),
                 ],
+              ),
+              CurrentLocationLayer(
+                positionStream: _positionStream(),
+                alignPositionOnUpdate:
+                    mapMode == 1 ? AlignOnUpdate.always : AlignOnUpdate.never,
+                alignDirectionOnUpdate:
+                    AlignOnUpdate.never, // No forzar alineación de dirección
+                style: const LocationMarkerStyle(
+                  marker: DefaultLocationMarker(color: Colors.blue),
+                  showAccuracyCircle: true,
+                ),
               ),
             ],
           ),
@@ -254,8 +294,10 @@ class _MapScreenState extends State<MapScreen> {
             bottom: 20,
             right: 20,
             child: FloatingActionButton(
-              onPressed: _determinePosition,
-              child: const Icon(Icons.my_location),
+              onPressed: _toggleGpsMode,
+              child: Icon(
+                mapMode == 1 ? Icons.gps_fixed : Icons.gps_not_fixed,
+              ),
             ),
           ),
         ],
