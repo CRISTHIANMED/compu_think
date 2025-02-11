@@ -72,8 +72,17 @@ class _AudioViewerPageState extends State<AudioViewerPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.nombre),
-        backgroundColor: Colors.blue.shade700,
+        title: Row(
+          children: [
+            Expanded(
+              child: Text(
+                widget.nombre,
+                softWrap: true,
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Colors.blue,
       ),
       body: isLoading
           ? const Center(

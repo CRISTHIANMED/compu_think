@@ -1,9 +1,11 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:compu_think/controllers/unit_controller.dart';
 import 'package:compu_think/models/entities/view_detail_unit_entity.dart';
 import 'package:compu_think/utils/helper/convert_google_drive_link.dart';
 import 'package:flutter/material.dart';
 import 'package:compu_think/utils/widgets/custom_bottom_navigation_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class UnitsPage extends StatefulWidget {
   const UnitsPage({super.key});
@@ -17,12 +19,10 @@ class UnitsPageState extends State<UnitsPage> {
   List<ViewDetailUnitEntity> _unidades = [];
   bool _isLoading = true;
   String _errorMessage = '';
-  late bool isEnabled;
 
   @override
   void initState() {
     super.initState();
-    // Cargar las unidades al iniciar la página
     fetchUnits();
   }
 
@@ -65,7 +65,7 @@ class UnitsPageState extends State<UnitsPage> {
             if (_isLoading)
               const Expanded(
                 child: Center(
-                  child: CircularProgressIndicator(),
+                  child: Text('Cargando unidades...'),
                 ),
               )
             else if (_errorMessage.isNotEmpty)
@@ -85,7 +85,7 @@ class UnitsPageState extends State<UnitsPage> {
                       decoration: BoxDecoration(
                         color: isEnabled!
                             ? unidad.colorFondo
-                            : unidad.colorFondo.withValues(alpha: 0.6),
+                            : unidad.colorFondo.withAlpha(153),
                         borderRadius: BorderRadius.circular(15),
                         boxShadow: const [
                           BoxShadow(color: Colors.black26, blurRadius: 5),
@@ -96,13 +96,7 @@ class UnitsPageState extends State<UnitsPage> {
                           Opacity(
                             opacity: isEnabled ? 1.0 : 0.5,
                             child: ClipOval(
-                              child: Stack(
-                                alignment: Alignment.center,
-                                children: [
-                                  _buildImage(unidad
-                                      .unidadUrlImagen), // Imagen con loader
-                                ],
-                              ),
+                              child: _buildImage(unidad.unidadUrlImagen),
                             ),
                           ),
                           const SizedBox(width: 16),
@@ -135,12 +129,10 @@ class UnitsPageState extends State<UnitsPage> {
                                 Opacity(
                                     opacity: isEnabled ? 1.0 : 0.5,
                                     child: Text(
-                                      unidad
-                                          .unidadDescripcion, // Muestra "Sin descripción" si es nula
+                                      unidad.unidadDescripcion,
                                       style: const TextStyle(
                                         color: Colors.black,
-                                        fontSize:
-                                            12, // Tamaño más pequeño para que sea sutil
+                                        fontSize: 12,
                                         fontStyle: FontStyle.italic,
                                       ),
                                     )),
@@ -194,31 +186,18 @@ class UnitsPageState extends State<UnitsPage> {
   Widget _buildImage(String imageUrl) {
     try {
       final convertedUrl = convertGoogleDriveLink(imageUrl);
-      return Image.network(
-        convertedUrl,
+      return CachedNetworkImage(
+        imageUrl: convertedUrl,
         width: 100,
         height: 100,
         fit: BoxFit.cover,
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) {
-            return child; // Si ya cargó, mostramos la imagen
-          }
-          return const Center(
-            child: CircularProgressIndicator(), // Indicador de carga
-          );
-        },
-        errorBuilder: (context, error, stackTrace) {
-          return const Text(
-            'Error al cargar la imagen',
-            style: TextStyle(color: Colors.red),
-          );
-        },
+        placeholder: (context, url) =>
+            Image.asset('assets/images/placeholder.png', width: 100, height: 100), // Imagen por defecto
+        errorWidget: (context, url, error) =>
+            const Icon(Icons.broken_image, size: 50, color: Colors.grey), // Icono en caso de error
       );
     } catch (e) {
-      return const Text(
-        'URL inválida',
-        style: TextStyle(color: Colors.red),
-      );
+      return Image.asset('assets/images/placeholder.png', width: 100, height: 100);
     }
   }
 }

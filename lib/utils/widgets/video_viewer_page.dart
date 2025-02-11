@@ -7,8 +7,8 @@ class VideoViewerPage extends StatefulWidget {
   final String videoUrl;
   final String nombre;
 
-
-  const VideoViewerPage({super.key, required this.nombre, required this.videoUrl});
+  const VideoViewerPage(
+      {super.key, required this.nombre, required this.videoUrl});
 
   @override
   State<VideoViewerPage> createState() => _VideoViewerPageState();
@@ -17,19 +17,17 @@ class VideoViewerPage extends StatefulWidget {
 class _VideoViewerPageState extends State<VideoViewerPage> {
   late YoutubePlayerController _controller;
 
-
   late PlayerState _playerState;
   late YoutubeMetaData _videoMetaData;
-  
+
   double _volume = 100;
   bool _muted = false;
   bool _isPlayerReady = true;
 
-
   @override
   void initState() {
     super.initState();
-     final videoId = YoutubePlayer.convertUrlToId(widget.videoUrl)!;
+    final videoId = YoutubePlayer.convertUrlToId(widget.videoUrl)!;
     _controller = YoutubePlayerController(
       initialVideoId: videoId,
       flags: const YoutubePlayerFlags(
@@ -69,11 +67,13 @@ class _VideoViewerPageState extends State<VideoViewerPage> {
     _controller.seekTo(Duration(seconds: newPosition));
   }
 
-    // Función para adelantar el video 10 segundos
+  // Función para adelantar el video 10 segundos
   void _fastForwardVideo() {
     final currentPosition = _controller.value.position.inSeconds;
     final videoDuration = _controller.metadata.duration.inSeconds;
-    final newPosition = currentPosition + 10 < videoDuration ? currentPosition + 10 : videoDuration;
+    final newPosition = currentPosition + 10 < videoDuration
+        ? currentPosition + 10
+        : videoDuration;
     _controller.seekTo(Duration(seconds: newPosition));
   }
 
@@ -109,16 +109,21 @@ class _VideoViewerPageState extends State<VideoViewerPage> {
         appBar: AppBar(
           backgroundColor: Colors.blue,
           leading: IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: () {
-                    Navigator.pop(context); // Regresar a la pantalla anterior
-                  },
-                ),
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pop(context); // Regresar a la pantalla anterior
+            },
+          ),
           title: Row(
-                  children: [
-                    Text(widget.nombre),
-                  ],
+            children: [
+              Expanded(
+                child: Text(
+                  widget.nombre,
+                  softWrap: true,
                 ),
+              ),
+            ],
+          ),
         ),
         body: ListView(
           children: [
@@ -133,9 +138,8 @@ class _VideoViewerPageState extends State<VideoViewerPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.replay_10),
-                        onPressed: _rewindVideo
-                      ),
+                          icon: const Icon(Icons.replay_10),
+                          onPressed: _rewindVideo),
                       IconButton(
                         icon: Icon(
                           _controller.value.isPlaying
@@ -212,7 +216,4 @@ class _VideoViewerPageState extends State<VideoViewerPage> {
   }
 
   Widget get _space => const SizedBox(height: 10);
-
-
 }
-

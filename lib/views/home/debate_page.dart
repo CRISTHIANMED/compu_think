@@ -53,7 +53,7 @@ class _DebatePageState extends State<DebatePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Debate"),
+        title: Text(widget.tipoRetoNombre),
         backgroundColor: Colors.blue,
         actions: [
           Padding(
@@ -126,10 +126,10 @@ class _DebatePageState extends State<DebatePage> {
                                 value: 'Editar',
                                 child: Text('Editar'),
                               ),
-                              const PopupMenuItem(
+                              /*const PopupMenuItem(
                                 value: 'Eliminar',
                                 child: Text('Eliminar'),
-                              ),
+                              ),*/
                             ],
                           )
                         : null,

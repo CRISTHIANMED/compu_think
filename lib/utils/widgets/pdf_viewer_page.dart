@@ -5,13 +5,16 @@ import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
 
-
 class PdfViewerPage extends StatefulWidget {
   final String pdfUrl;
   final String nombre;
   final String tema;
 
-  const PdfViewerPage({super.key, required this.pdfUrl, required this.nombre, required this.tema});
+  const PdfViewerPage(
+      {super.key,
+      required this.pdfUrl,
+      required this.nombre,
+      required this.tema});
 
   @override
   PdfViewerPageState createState() => PdfViewerPageState();
@@ -27,32 +30,32 @@ class PdfViewerPageState extends State<PdfViewerPage> {
     _downloadAndSavePdf();
   }
 
- Future<void> _downloadAndSavePdf() async {
-  try {
-    final response = await http.get(Uri.parse(convertGoogleDriveLink(widget.pdfUrl)));
-    if (response.statusCode == 200) {
-      final directory = await getApplicationDocumentsDirectory();
-      final file = File('${directory.path}/temp.pdf');
-      await file.writeAsBytes(response.bodyBytes);
+  Future<void> _downloadAndSavePdf() async {
+    try {
+      final response =
+          await http.get(Uri.parse(convertGoogleDriveLink(widget.pdfUrl)));
+      if (response.statusCode == 200) {
+        final directory = await getApplicationDocumentsDirectory();
+        final file = File('${directory.path}/temp.pdf');
+        await file.writeAsBytes(response.bodyBytes);
+        if (mounted) {
+          setState(() {
+            localPath = file.path;
+            isLoading = false;
+          });
+        }
+      } else {
+        throw Exception("Error al descargar el PDF");
+      }
+    } catch (e) {
       if (mounted) {
         setState(() {
-          localPath = file.path;
           isLoading = false;
         });
       }
-    } else {
-      throw Exception("Error al descargar el PDF");
+      _showErrorDialog(e.toString());
     }
-  } catch (e) {
-    if (mounted) {
-      setState(() {
-        isLoading = false;
-      });
-    }
-    _showErrorDialog(e.toString());
   }
-}
-
 
   Future<void> _savePdfToDownloads() async {
     try {
@@ -100,18 +103,27 @@ class PdfViewerPageState extends State<PdfViewerPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Vista de PDF"),
+        title: Row(
+          children: [
+            Expanded(
+              child: Text(
+                widget.nombre,
+                softWrap: true,
+              ),
+            ),
+          ],
+        ),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
-        actions: [
+        /*actions: [
           IconButton(
             icon: const Icon(Icons.download),
             onPressed: _savePdfToDownloads,
           ),
-        ],
+        ],*/
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())

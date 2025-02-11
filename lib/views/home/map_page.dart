@@ -322,10 +322,14 @@ class _MapPageState extends State<MapPage> {
               onPressed: () async {
                 await _challengeController.updateCalificacion(
                     _idPersona, widget.idUnidad, 3, isApproved, percentage);
-                if (mounted) {
+
+                if (!mounted) {
+                  return; // Evita llamadas a Navigator si el widget ya no está montado
+                }
+
+                if (context.mounted) {
                   Navigator.pop(context); // Cierra el cuadro de diálogo
-                  Navigator.pop(
-                      context, true); // Regresa a la pantalla anterior (retos)
+                  Navigator.pop(context, isApproved); // Regresa a la pantalla anterior (retos)
                 }
               },
               child: const Text("Continuar"),
@@ -430,7 +434,7 @@ class _MapPageState extends State<MapPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Mapa de Preguntas"),
+        title: Text(widget.tipoRetoNombre),
         backgroundColor: Colors.blue,
         actions: [
           Padding(
