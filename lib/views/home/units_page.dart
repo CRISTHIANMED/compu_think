@@ -5,7 +5,6 @@ import 'package:compu_think/utils/helper/convert_google_drive_link.dart';
 import 'package:flutter/material.dart';
 import 'package:compu_think/utils/widgets/custom_bottom_navigation_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class UnitsPage extends StatefulWidget {
   const UnitsPage({super.key});
