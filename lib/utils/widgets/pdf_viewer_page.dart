@@ -57,7 +57,7 @@ class PdfViewerPageState extends State<PdfViewerPage> {
     }
   }
 
-  Future<void> _savePdfToDownloads() async {
+  /*Future<void> _savePdfToDownloads() async {
     try {
       if (localPath != null) {
         final directory = await getExternalStorageDirectory();
@@ -81,7 +81,7 @@ class PdfViewerPageState extends State<PdfViewerPage> {
         );
       }
     }
-  }
+  }*/
 
   void _showErrorDialog(String message) {
     showDialog(

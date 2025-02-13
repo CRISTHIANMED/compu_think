@@ -13,7 +13,7 @@ Widget buildAudioContent(
     padding: const EdgeInsets.all(15.0), // Espaciado externo
     child: Container(
       decoration: BoxDecoration(
-        color: Colors.blue.withOpacity(0.1), // Fondo semitransparente
+        color: Colors.blue.withAlpha(26), // Fondo semitransparente
         borderRadius: BorderRadius.circular(12), // Bordes redondeados
         border: Border.all(color: Colors.blue), // Borde azul
       ),
