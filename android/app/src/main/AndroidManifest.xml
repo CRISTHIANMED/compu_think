@@ -3,7 +3,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>    
     <uses-feature android:name="android.hardware.location.gps"/>     
     <application
-        android:label="CompuThink"
+        android:label="CODE"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

@@ -62,7 +62,7 @@ class ViewDetailUnitEntity {
       unidadDescripcion: map['unidad_descripcion'],
       unidadOrden: map['unidad_orden'],
       unidadVigente: map['unidad_vigente'],
-      unidadUrlImagen: map['unidad_url_imagen'],
+      unidadUrlImagen: map['unidad_url_imagen'] ?? '',
       tipoEstadoDescripcion: map['tipo_estado_descripcion'],
       colorFondo: map['color_fondo'] ?? Colors.grey ,  // Obtener colorFondo
       isEnabled: map['is_enabled'],    // Obtener isEnabled

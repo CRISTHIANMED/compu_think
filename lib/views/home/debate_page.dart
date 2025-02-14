@@ -29,6 +29,7 @@ class DebatePage extends StatefulWidget {
 class _DebatePageState extends State<DebatePage> {
   final TextEditingController _controller = TextEditingController();
   final DebateController debateController = DebateController();
+  bool _isSending = false;
 
   @override
   void initState() {
@@ -162,52 +163,67 @@ class _DebatePageState extends State<DebatePage> {
                 const SizedBox(width: 10),
                 IconButton(
                   icon: const Icon(Icons.send),
-                  onPressed: () async {
-                    if (_controller.text.isNotEmpty) {
-                      // Validar el comentario
-                      if (!debateController.isValidComment(_controller.text)) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: const Text(
-                                'El comentario no tiene suficientes palabras para ser válido.'),
-                            action: SnackBarAction(
-                              label: 'Cerrar', // Etiqueta del botón para cerrar
-                              onPressed: () {
-                                ScaffoldMessenger.of(context)
-                                    .hideCurrentSnackBar();
-                              },
-                            ),
-                            duration: const Duration(
-                                seconds: 2), // Duración más corta si se desea
-                          ),
-                        );
-                        return;
-                      }
-                      try {
-                        // Llamar a la función addComment
-                        String? resultMessage =
-                            await debateController.addComment(
-                          widget.idPersona,
-                          widget.idReto,
-                          _controller.text,
-                          () => setState(() {}),
-                        );
+                  onPressed: _isSending
+                      ? null // Deshabilita el botón si _isSending es true
+                      : () async {
+                          if (_controller.text.isNotEmpty) {
+                            setState(() {
+                              _isSending = true; // Deshabilita el botón
+                            });
 
-                        // Limpiar el campo de texto
-                        _controller.clear();
+                            // Validar el comentario
+                            if (!debateController
+                                .isValidComment(_controller.text)) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: const Text(
+                                      'El comentario no tiene suficientes palabras para ser válido.'),
+                                  action: SnackBarAction(
+                                    label: 'Cerrar',
+                                    onPressed: () {
+                                      ScaffoldMessenger.of(context)
+                                          .hideCurrentSnackBar();
+                                    },
+                                  ),
+                                  duration: const Duration(seconds: 2),
+                                ),
+                              );
+                              setState(() {
+                                _isSending =
+                                    false; // Habilita el botón nuevamente
+                              });
+                              return;
+                            }
 
-                        // Verificar si se completó el reto y mostrar el AlertDialog
-                        if (resultMessage != null) {
-                          _showCompletionDialog(
-                              resultMessage); // Mostrar el mensaje en un AlertDialog
-                        }
-                      } catch (e) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(e.toString())),
-                        );
-                      }
-                    }
-                  },
+                            try {
+                              // Llamar a la función addComment
+                              String? resultMessage =
+                                  await debateController.addComment(
+                                widget.idPersona,
+                                widget.idReto,
+                                _controller.text,
+                                () => setState(() {}),
+                              );
+
+                              // Limpiar el campo de texto
+                              _controller.clear();
+
+                              // Verificar si se completó el reto y mostrar el AlertDialog
+                              if (resultMessage != null) {
+                                _showCompletionDialog(resultMessage);
+                              }
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(e.toString())),
+                              );
+                            } finally {
+                              setState(() {
+                                _isSending =
+                                    false; // Habilita el botón nuevamente
+                              });
+                            }
+                          }
+                        },
                 )
               ],
             ),
