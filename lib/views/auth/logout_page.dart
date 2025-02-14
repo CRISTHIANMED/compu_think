@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously, library_private_types_in_public_api
+// ignore_for_file: use_build_context_synchronously, library_private_types_in_public_api, unused_local_variable
 
 import 'package:compu_think/controllers/auth_controller.dart';
 import 'package:compu_think/utils/widgets/custom_bottom_navigation_bar.dart';
@@ -34,7 +34,7 @@ class _LogoutPageState extends State<LogoutPage> {
 
     // Construir el nombre completo y asignar el correo
     setState(() {
-      userName = "$nombre1 $nombre2 $apellido1 $apellido2"
+      userName = "$nombre1 $apellido1"
           .replaceAll(RegExp(r'\s+'), ' ')
           .trim();
       userEmail = email;

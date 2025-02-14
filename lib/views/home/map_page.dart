@@ -12,6 +12,7 @@ import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:math';
 
 class MapPage extends StatefulWidget {
   final int idUnidad;
@@ -39,7 +40,8 @@ class _MapPageState extends State<MapPage> {
   String? _errorMessage;
   late int _idPersona;
 
-  LatLng currentLocation = const LatLng(1.2136, -77.2811);
+  //LatLng _currentLocation = LatLng(1.2136, -77.2811);
+  LatLng? _currentLocation;
   LatLng locationPasto = const LatLng(1.2136, -77.2811);
   int mapMode = 1; // 1: gps_fixed, 3: gps_not_fixed
   bool alignOnUpdate = false;
@@ -202,6 +204,10 @@ class _MapPageState extends State<MapPage> {
 
   Stream<LocationMarkerPosition?> _positionStream() {
     return Geolocator.getPositionStream().map((Position position) {
+      // Actualiza _currentLocation con la nueva posición
+      setState(() {
+        _currentLocation = LatLng(position.latitude, position.longitude);
+      });
       return LocationMarkerPosition(
         latitude: position.latitude,
         longitude: position.longitude,
@@ -329,7 +335,8 @@ class _MapPageState extends State<MapPage> {
 
                 if (context.mounted) {
                   Navigator.pop(context); // Cierra el cuadro de diálogo
-                  Navigator.pop(context, isApproved); // Regresa a la pantalla anterior (retos)
+                  Navigator.pop(context,
+                      isApproved); // Regresa a la pantalla anterior (retos)
                 }
               },
               child: const Text("Continuar"),
@@ -430,6 +437,23 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
+  double _calculateDistance(LatLng loc1, LatLng loc2) {
+    const double earthRadius = 6371000; // Radio de la Tierra en metros
+    double dLat = _toRadians(loc2.latitude - loc1.latitude);
+    double dLng = _toRadians(loc2.longitude - loc1.longitude);
+    double a = sin(dLat / 2) * sin(dLat / 2) +
+        cos(_toRadians(loc1.latitude)) *
+            cos(_toRadians(loc2.latitude)) *
+            sin(dLng / 2) *
+            sin(dLng / 2);
+    double c = 2 * atan2(sqrt(a), sqrt(1 - a));
+    return earthRadius * c;
+  }
+
+  double _toRadians(double degree) {
+    return degree * pi / 180;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -438,11 +462,9 @@ class _MapPageState extends State<MapPage> {
         backgroundColor: Colors.blue,
         actions: [
           Padding(
-            padding:
-                const EdgeInsets.only(right: 16.0), // Ajusta el margen derecho
+            padding: const EdgeInsets.only(right: 16.0),
             child: IconButton(
-              icon: const Icon(Icons.picture_as_pdf,
-                  size: 35), // Tamaño aumentado
+              icon: const Icon(Icons.picture_as_pdf, size: 35),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -461,7 +483,6 @@ class _MapPageState extends State<MapPage> {
       ),
       body: Stack(
         children: [
-          // Mapa y contenido
           Stack(
             children: [
               FlutterMap(
@@ -472,8 +493,7 @@ class _MapPageState extends State<MapPage> {
                   onPositionChanged: (position, hasGesture) {
                     if (hasGesture) {
                       setState(() {
-                        mapMode =
-                            3; // Activa modo manual cuando el usuario mueve el mapa
+                        mapMode = 3;
                       });
                     }
                   },
@@ -489,22 +509,44 @@ class _MapPageState extends State<MapPage> {
                       ..._questions.map((question) {
                         LatLng? location = _questionLocations[question.id];
                         if (location == null) {
-                          return null; // Ignorar si no hay ubicación
+                          return null;
                         }
+                        bool isNear = _currentLocation != null &&
+                            _calculateDistance(_currentLocation!, location) <
+                                20;
                         return Marker(
                           width: 40.0,
                           height: 40.0,
                           point: location,
                           child: GestureDetector(
-                            onTap: () => _showQuestionDialog(question),
-                            child: const Icon(
-                              Icons.location_on_rounded,
-                              color: Colors.red,
-                              size: 50,
+                            onTap: () {
+                              if (isNear) {
+                                _showQuestionDialog(
+                                    question); // Mostrar el diálogo si está cerca
+                              } else {
+                                // Mostrar un mensaje si no está cerca
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                        'Debes estar ubicado cerca a la pregunta para acceder.'),
+                                    duration: Duration(
+                                        seconds: 2), // Duración del mensaje
+                                  ),
+                                );
+                              }
+                            },
+                            child: Column(
+                              children: [
+                                Icon(
+                                  Icons.location_on_rounded,
+                                  color: isNear ? Colors.green : Colors.grey,
+                                  size: 40,
+                                ),
+                              ],
                             ),
                           ),
                         );
-                      }).whereType<Marker>(), // Filtra los valores nulos
+                      }).whereType<Marker>(),
                     ],
                   ),
                   CurrentLocationLayer(
@@ -532,12 +574,10 @@ class _MapPageState extends State<MapPage> {
               ),
             ],
           ),
-
-          // Indicador de carga
           if (_isLoading)
             Positioned.fill(
               child: Container(
-                color: Colors.black.withAlpha(77), // Fondo semitransparente
+                color: Colors.black.withAlpha(77),
                 child: const Center(
                   child: CircularProgressIndicator(),
                 ),
