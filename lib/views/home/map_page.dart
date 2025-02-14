@@ -439,15 +439,15 @@ class _MapPageState extends State<MapPage> {
 
   double _calculateDistance(LatLng loc1, LatLng loc2) {
     const double earthRadius = 6371000; // Radio de la Tierra en metros
+    double lat1 = _toRadians(loc1.latitude);
+    double lat2 = _toRadians(loc2.latitude);
     double dLat = _toRadians(loc2.latitude - loc1.latitude);
     double dLng = _toRadians(loc2.longitude - loc1.longitude);
+
     double a = sin(dLat / 2) * sin(dLat / 2) +
-        cos(_toRadians(loc1.latitude)) *
-            cos(_toRadians(loc2.latitude)) *
-            sin(dLng / 2) *
-            sin(dLng / 2);
-    double c = 2 * atan2(sqrt(a), sqrt(1 - a));
-    return earthRadius * c;
+        cos(lat1) * cos(lat2) * sin(dLng / 2) * sin(dLng / 2);
+
+    return 2 * earthRadius * atan2(sqrt(a), sqrt(1 - a));
   }
 
   double _toRadians(double degree) {
@@ -514,33 +514,56 @@ class _MapPageState extends State<MapPage> {
                         bool isNear = _currentLocation != null &&
                             _calculateDistance(_currentLocation!, location) <
                                 20;
+                        double distance = _currentLocation != null
+                            ? _calculateDistance(_currentLocation!, location)
+                            : 0.0;
                         return Marker(
-                          width: 40.0,
-                          height: 40.0,
+                          width: 60.0,
+                          height: 80.0,
                           point: location,
                           child: GestureDetector(
                             onTap: () {
                               if (isNear) {
-                                _showQuestionDialog(
-                                    question); // Mostrar el diálogo si está cerca
+                                _showQuestionDialog(question);
                               } else {
-                                // Mostrar un mensaje si no está cerca
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                     content: Text(
                                         'Debes estar ubicado cerca a la pregunta para acceder.'),
-                                    duration: Duration(
-                                        seconds: 2), // Duración del mensaje
+                                    duration: Duration(seconds: 2),
                                   ),
                                 );
                               }
                             },
-                            child: Column(
+                            child: Stack(
+                              alignment: Alignment.center,
                               children: [
                                 Icon(
                                   Icons.location_on_rounded,
                                   color: isNear ? Colors.green : Colors.grey,
                                   size: 40,
+                                ),
+                                // Texto de la distancia (posicionado arriba del marcador)
+                                Positioned(
+                                  top:
+                                      0, // Colocar el texto en la parte superior
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 4, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withAlpha(204),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: Text(
+                                      '${distance.toStringAsFixed(1)} m', // Distancia con un decimal
+                                      style: TextStyle(
+                                        color:
+                                            isNear ? Colors.green : Colors.grey,
+                                        fontSize: 12, // Tamaño del texto
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
