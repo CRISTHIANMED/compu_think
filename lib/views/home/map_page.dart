@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api, unused_field
+// ignore_for_file: library_private_types_in_public_api, unused_field, dead_code
 import 'package:compu_think/controllers/challenge_controller.dart';
 import 'package:compu_think/controllers/geo_controller.dart';
 import 'package:compu_think/controllers/questions_controller.dart';
@@ -513,7 +513,8 @@ class _MapPageState extends State<MapPage> {
                         }
                         bool isNear = _currentLocation != null &&
                             _calculateDistance(_currentLocation!, location) <
-                                20;
+                            20;
+                        //bool isNear = true;        
                         double distance = _currentLocation != null
                             ? _calculateDistance(_currentLocation!, location)
                             : 0.0;
