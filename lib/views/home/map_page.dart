@@ -489,7 +489,7 @@ class _MapPageState extends State<MapPage> {
                 mapController: _mapController,
                 options: MapOptions(
                   initialCenter: _calculateCenter(_questionLocations),
-                  initialZoom: 15.0,
+                  initialZoom: 18.0,
                   onPositionChanged: (position, hasGesture) {
                     if (hasGesture) {
                       setState(() {
@@ -503,6 +503,17 @@ class _MapPageState extends State<MapPage> {
                     urlTemplate:
                         "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
                     retinaMode: RetinaMode.isHighDensity(context),
+                  ),
+                  CurrentLocationLayer(
+                    positionStream: _positionStream(),
+                    alignPositionOnUpdate: (mapMode == 1 && centrarUsuario)
+                        ? AlignOnUpdate.always
+                        : AlignOnUpdate.never,
+                    alignDirectionOnUpdate: AlignOnUpdate.never,
+                    style: const LocationMarkerStyle(
+                      marker: DefaultLocationMarker(color: Colors.blue),
+                      showAccuracyCircle: true,
+                    ),
                   ),
                   MarkerLayer(
                     markers: [
@@ -573,17 +584,7 @@ class _MapPageState extends State<MapPage> {
                       }).whereType<Marker>(),
                     ],
                   ),
-                  CurrentLocationLayer(
-                    positionStream: _positionStream(),
-                    alignPositionOnUpdate: (mapMode == 1 && centrarUsuario)
-                        ? AlignOnUpdate.always
-                        : AlignOnUpdate.never,
-                    alignDirectionOnUpdate: AlignOnUpdate.never,
-                    style: const LocationMarkerStyle(
-                      marker: DefaultLocationMarker(color: Colors.blue),
-                      showAccuracyCircle: true,
-                    ),
-                  ),
+                  
                 ],
               ),
               Positioned(
